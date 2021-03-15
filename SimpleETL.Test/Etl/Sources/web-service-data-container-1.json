@@ -1,0 +1,227 @@
+{
+  "name": "10.discussions-history.vdb.ec.odkl.ru",
+  "hostOnlyName": "10.discussions-history.vdb.ec",
+  "container": "discussions-history",
+  "id": 10,
+  "sortName": "ru.odkl.ec.vdb.discussions-history.10",
+  "state": "RUNNING",
+  "outcome": "NA",
+  "serviceName": "discussions-history.vdb",
+  "serviceSimpleName": "discussions-history",
+  "queueName": "vdb.db.discussions.prod",
+  "minion": "srve3078",
+  "minionIp": "10.4.15.52",
+  "runid": "8d1983f0-3f1a-11e9-9e71-1f3b835d23f8",
+  "image": "one-voldemort",
+  "version": "2.0.7",
+  "network": { "lan": "lan:10.16.10.11:1000000" },
+  "alloc": {
+    "vcores": "4",
+    "mem": "20480M",
+    "lan_out": "300M",
+    "lan_in": "300M"
+  },
+  "utilized": {
+    "vcores": "0.42",
+    "mem": "3568.417M",
+    "lan_out": "59.71M",
+    "lan_in": "19.4M"
+  },
+  "utilization": {
+    "vcores": "0.1",
+    "mem": "0.174M",
+    "lan_out": "0.2M",
+    "lan_in": "0.06M"
+  },
+  "startedPorts": [ 6667 ],
+  "timeouts": {
+    "deploy": "5m",
+    "start": "20m",
+    "stop": "10m"
+  },
+  "env": {
+    "sysctl.net.ipv6.conf.all.disable_ipv6": "1",
+    "db.url.configuration": "jdbc:inetdae7:192.168.8.205:716?database=conf&queryTimeout=30&dstsave=true&loginTimeout=10",
+    "db.password": "******",
+    "jmx_user": "admin",
+    "db.username": "sa",
+    "conf-service.properties": "app.conf-service.remoteServiceEnabled=true\napp.conf-service.clusterConfiguration=<cluster class=\"one.cluster.Cluster\"><providers class=\"one.app.remote.client.BlosProvider\" monitor-timeout=\"10000\" preferred=\"auto\"><provider id=\"srvd607\" url=\"ssl://10.137.13.140:30603?clientMaxPoolSize=3&amp;timeout=1000&amp;readTimeout=30000\"/><provider id=\"srve1535\" url=\"ssl://10.136.13.140:30603?clientMaxPoolSize=3&amp;timeout=1000&amp;readTimeout=30000\"/><provider id=\"srvk1767\" url=\"ssl://10.138.13.140:30603?clientMaxPoolSize=3&amp;timeout=1000&amp;readTimeout=30000\"/></providers><group id=\"ConfService\"><tasks>default</tasks><provider ids=\"srvd607,srve1535,srvk1767\"/></group></cluster>\napp.conf-service.maxNumberOfClusterConcurrentRequest=3\napp.conf-service.maxNumberOfAllowedFailures=10\nconfigservice.use-service=true",
+    "cloud_fail_fast_min_pids": "2",
+    "cloud_fail_fast_timeout": "20",
+    "log_servers": "10.136.11.136,10.136.11.137,10.136.11.138,192.168.13.145,192.168.13.146,192.168.13.147",
+    "db.driver": "com.inet.tds.TdsDriver",
+    "jmx_password": "******",
+    "sysctl.net.ipv6.conf.default.disable_ipv6": "1",
+    "sysctl.net.core.somaxconn": "65535",
+    "iptables.accept_from": "10.136.22.0/26,10.137.22.0/26,10.138.22.0/26,10.139.22.0/26,10.140.22.0/26,5.61.16.80/28,5.61.18.112/28,185.16.244.80/28,10.131.5.160/28,10.128.5.160/28,10.129.5.160/28,10.130.5.160/28,10.132.5.160/28,217.20.146.240/29,217.20.149.56/29,217.20.153.192/29,217.20.150.248/29,5.61.16.224/29,5.61.17.224/29,5.61.18.224/29,5.61.19.224/29,10.136.255.224/28,10.137.255.224/28,10.138.255.224/28,10.139.255.224/28,10.129.1.64/28,10.128.1.64/28,10.131.1.64/28,10.130.1.64/28,10.136.11.16/28,10.137.11.16/28,10.138.11.16/28,10.139.11.16/28,5.61.16.32/28,5.61.18.136/29,5.61.17.136/29,10.140.11.16/28,10.132.1.64/28,185.16.244.64/29,10.136.13.144/28,10.137.13.144/28,10.138.13.144/28,10.139.13.144/28,10.128.1.96/28,10.129.1.96/28,10.130.1.96/28,10.131.1.96/28,10.136.19.80/28,10.137.19.80/28,10.138.19.80/28,10.139.19.80/28,192.168.8.225/32,10.136.20.240/29,10.137.20.240/29,10.138.20.240/29,10.139.20.240/29,10.136.26.0/27,10.137.26.0/27,10.138.26.0/27,10.139.26.0/27,10.140.26.0/27,192.168.32.10/32,192.168.34.34/32,192.168.36.160/32,192.168.41.91/32,192.168.49.113/32,192.168.64.14/32,192.168.8.113/32,192.168.9.199/32,192.168.9.46/32"
+  },
+  "alerts": {},
+  "availability": "RESERVED*1.50",
+  "digest": "sha256:2147e5979688e0cf9c3025e30e23d29f47822602a04a8be7b1596c87fa55a41e",
+  "started": 1551772106864,
+  "hierarchy": "10.discussions-history.vdb.db.discussions.prod.EC",
+  "imageReport": {
+    "timestamp": 1551776793645,
+    "image": {
+      "digest": "sha256:2147e5979688e0cf9c3025e30e23d29f47822602a04a8be7b1596c87fa55a41e",
+      "created": 1551436302130,
+      "baseCreated": 1551434817905,
+      "baseVersion": "centos7-one-voldemort:stable"
+    },
+    "newestBase": {
+      "digest": "sha256:1999e1bfc85b3f1f44cfca56489e0e1b7f75fb0ddc47f9a3ae2505dea8fba09e",
+      "created": 1551434817905
+    },
+    "upToDate": true,
+    "updateRequired": false,
+    "baseVersion": "centos7-one-voldemort:stable"
+  },
+  "volumes": [
+    {
+      "minion": "srve3078",
+      "uuid": "fc646cb1-feac-11e8-8372-29d606f9e3df",
+      "type": "hdd",
+      "hierarchy": "vdb.db.discussions.prod.EC/discussions-history/10/arch",
+      "primary": true,
+      "queue": "vdb.db.discussions.prod",
+      "storage": "discussions-history",
+      "instance": 10,
+      "volume": "arch",
+      "alloc": {
+        "bytes": 1099511627776,
+        "spindels": 0.0
+      },
+      "capacity": {
+        "bytes": 1099511627776,
+        "spindels": 0.0
+      },
+      "used": {
+        "bytes": 260905140224,
+        "spindels": 0.0
+      },
+      "prealloc": {
+        "vcores": "4",
+        "mem": "20G",
+        "lan_out": "300",
+        "lan_in": "300"
+      },
+      "state": "MOUNTED",
+      "created": 1544687971469,
+      "mounted": 1551771889856,
+      "tasks": { "10.discussions-history.vdb.ec.odkl.ru": "/mnt/arch" },
+      "sourcesCount": 0,
+      "devices": [ "9eec6506-ba99-32f2-9f86-1660bbb1af26" ],
+      "growPossible": false
+    },
+    {
+      "minion": "srve3078",
+      "uuid": "fc646cb2-feac-11e8-8372-29d606f9e3df",
+      "type": "hdd",
+      "hierarchy": "vdb.db.discussions.prod.EC/discussions-history/10/commitlog",
+      "primary": true,
+      "queue": "vdb.db.discussions.prod",
+      "storage": "discussions-history",
+      "instance": 10,
+      "volume": "commitlog",
+      "alloc": {
+        "bytes": 2199023255552,
+        "spindels": 0.0
+      },
+      "capacity": {
+        "bytes": 2199023255552,
+        "spindels": 0.0
+      },
+      "used": {
+        "bytes": 597848653824,
+        "spindels": 0.0
+      },
+      "prealloc": {
+        "vcores": "4",
+        "mem": "20G",
+        "lan_out": "300",
+        "lan_in": "300"
+      },
+      "state": "MOUNTED",
+      "created": 1544687971469,
+      "mounted": 1551771889856,
+      "tasks": { "10.discussions-history.vdb.ec.odkl.ru": "/mnt/commitlog" },
+      "sourcesCount": 0,
+      "devices": [ "9eec6506-ba99-32f2-9f86-1660bbb1af26" ],
+      "growPossible": false
+    },
+    {
+      "minion": "srve3078",
+      "uuid": "fc646cb3-feac-11e8-8372-29d606f9e3df",
+      "type": "ssd",
+      "hierarchy": "vdb.db.discussions.prod.EC/discussions-history/10/db",
+      "primary": true,
+      "queue": "vdb.db.discussions.prod",
+      "storage": "discussions-history",
+      "instance": 10,
+      "volume": "db",
+      "alloc": {
+        "bytes": 214748364800,
+        "spindels": 1.0
+      },
+      "capacity": {
+        "bytes": 214748364800,
+        "spindels": 1.0
+      },
+      "used": {
+        "bytes": 63580610560,
+        "spindels": 0.06322941
+      },
+      "prealloc": {
+        "vcores": "4",
+        "mem": "20G",
+        "lan_out": "300",
+        "lan_in": "300"
+      },
+      "state": "MOUNTED",
+      "created": 1544687971469,
+      "mounted": 1551771889856,
+      "tasks": { "10.discussions-history.vdb.ec.odkl.ru": "/mnt/db" },
+      "sourcesCount": 0,
+      "devices": [ "f393021c-e535-3381-a4c8-ef2feac07891" ],
+      "growPossible": false
+    },
+    {
+      "minion": "srve3078",
+      "uuid": "262944c0-198e-11e9-a3d4-1f3b835d23f8",
+      "type": "memdisk",
+      "hierarchy": "vdb.db.discussions.prod.EC/discussions-history/10/memory",
+      "primary": true,
+      "queue": "vdb.db.discussions.prod",
+      "storage": "discussions-history",
+      "instance": 10,
+      "volume": "memory",
+      "alloc": {
+        "bytes": 44023414784,
+        "spindels": 0.0
+      },
+      "capacity": {
+        "bytes": 44023414784,
+        "spindels": 0.0
+      },
+      "used": {
+        "bytes": 42949672960,
+        "spindels": 0.0
+      },
+      "prealloc": {
+        "vcores": "4",
+        "mem": "20G",
+        "lan_out": "300",
+        "lan_in": "300"
+      },
+      "state": "MOUNTED",
+      "created": 1547643406621,
+      "mounted": 1551771889856,
+      "tasks": { "10.discussions-history.vdb.ec.odkl.ru": "/dev/shm" },
+      "sourcesCount": 0,
+      "devices": [ "9a8c262c-a35e-37dd-83e4-c40f29985d8a" ],
+      "growPossible": false
+    }
+  ],
+  "updatePending": false,
+  "alertCount": 0
+}

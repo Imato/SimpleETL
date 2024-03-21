@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public class EtlColumn
     {
         public int Id { get; }
         public string Name { get; }
-        public Type Type { get; private set;  }
+        public Type Type { get; private set; }
 
         public EtlColumn(int id, string name, Type type)
         {
@@ -22,14 +22,14 @@ namespace SimpleETL
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode();
+            return Name.GetHashCode() + 4424245;
         }
 
         public override bool Equals(object obj)
         {
-            var o = obj as EtlColumn;
-            return o == null ? false : o.Name == Name;
+            return (obj as EtlColumn)?.Name == Name;
         }
+
         public override string ToString()
         {
             return Name;

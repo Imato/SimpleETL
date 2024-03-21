@@ -1,22 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public abstract class DataSource : EtlObject, IDataSource
     {
         protected IEtlDataFlow flow;
 
-        public DataSource()
+        public DataSource() : base()
         {
-            Debug("Open data source");
             flow = new EtlDataFlow();
-        }
-        
-
-        public override void Dispose()
-        {
-            Debug("Close data source");
         }
 
         protected IEtlRow CreateRow()

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public static class ExceptionUtils
     {

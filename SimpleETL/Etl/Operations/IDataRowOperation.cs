@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace SimpleETL
+﻿namespace Imato.SimpleETL
 {
-    public interface IDataRowOperation
+    public interface IRowOperation
     {
-        IEtlRow Process(IEtlRow row = null);
+        IEtlRow Process(IEtlRow row);
     }
 }

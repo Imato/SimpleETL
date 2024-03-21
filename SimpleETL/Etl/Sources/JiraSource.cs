@@ -7,7 +7,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public class JiraSource : DataSource
     {
@@ -27,8 +27,8 @@ namespace SimpleETL
         /// <param name="fields">List of JIRA fields: key:jiraField.property value:dataFlowField or for strings (not jira objects) key:jiraField value:dataFlowField</param>
         /// <param name="jql">JQL for select data</param>
         /// <param name="taskList">OR JIRA tasks list for select data</param>
-        public JiraSource(string url, string basicCredentials, 
-            IEnumerable<KeyValuePair<string, string>> fields, 
+        public JiraSource(string url, string basicCredentials,
+            IEnumerable<KeyValuePair<string, string>> fields,
             string jql = null,
             IEnumerable<string> taskList = null,
             EtlObject parent = null)
@@ -40,7 +40,7 @@ namespace SimpleETL
             _taskList = taskList;
             _url = url ?? throw new ArgumentNullException(nameof(url));
             ParentEtl = parent;
-            
+
             if (fields == null)
                 throw new ArgumentNullException(nameof(fields));
             else
@@ -59,7 +59,6 @@ namespace SimpleETL
                     _fields.Add(jf);
                 }
             }
-                
 
             _http = new HttpClient()
             {
@@ -68,17 +67,17 @@ namespace SimpleETL
 
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
                         Convert.ToBase64String(
-                        Encoding.Default.GetBytes(basicCredentials)));            
+                        Encoding.Default.GetBytes(basicCredentials)));
         }
 
         public override IEnumerable<IEtlRow> GetData()
         {
             Log($"Try to get data from JIRA: {_url}");
 
-            var rowCount = 0;            
+            var rowCount = 0;
 
             foreach (var issue in GetIssues())
-            {    
+            {
                 rowCount++;
                 yield return GetNewRow(issue);
             }
@@ -96,12 +95,12 @@ namespace SimpleETL
                 {
                     yield return item;
                 }
-            }                
+            }
             else
                 foreach (var task in _taskList)
                 {
                     var taskUri = new Uri($"{_url}/issue/{task}");
-                    foreach(var item in GetIssues(taskUri))
+                    foreach (var item in GetIssues(taskUri))
                     {
                         yield return item;
                     }
@@ -126,11 +125,10 @@ namespace SimpleETL
                 {
                     Log($"{uri}: errorText");
                     yield break;
-                }                   
+                }
 
                 throw new ApplicationException(errorText);
-            }               
-
+            }
 
             if (json["issues"] != null)
             {
@@ -151,7 +149,6 @@ namespace SimpleETL
 
             if (issue.HasValues)
             {
-
                 row["key"] = issue["key"]?.Value<string>();
 
                 foreach (var field in _fields)
@@ -161,14 +158,14 @@ namespace SimpleETL
                     if (field.SubKey == null)
                         value = issue["fields"][field.Key];
 
-                    if (field.SubKey != null 
+                    if (field.SubKey != null
                         && issue["fields"][field.Key] != null
                         && issue["fields"][field.Key].HasValues)
                         value = issue["fields"][field.Key][field.SubKey];
 
                     row[field.DbField] = value?.GetTypedValue();
                 }
-            }            
+            }
 
             return row;
         }

@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public interface IDataDestination
     {
-        void PutData(IEnumerable<IEtlRow> data);        
+        void PutData(IEnumerable<IEtlRow> data);
+
+        void PutData(IEtlRow row);
     }
 }

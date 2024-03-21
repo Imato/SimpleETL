@@ -1,37 +1,42 @@
-﻿
-namespace SimpleETL
+﻿using Imato.SimpleETL.Infrastructure;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+namespace Imato.SimpleETL
 {
-    public class EtlContext
+    public static class EtlContext
     {
-        public IConfigurationService ConfigurationService { get; set; }
-        public ILogger Logger { get; set; }
+        public static IServiceProvider Services = null!;
 
-        private object _configuration;
-        private object _lock = new object();
-
-        private static EtlContext _context = new EtlContext();
-
-        public static EtlContext GetContext() => _context;        
-
-        public T GetConfiguration<T>()
+        private static void Check()
         {
-            lock (_lock)
+            if (Services == null)
             {
-                if (_configuration == null && ConfigurationService != null)
-                    _configuration = ConfigurationService.GetConfiguration<T>();
-            }            
-
-            return EtlConverter.TryGetValue<T, object>(_configuration);
+                throw new ArgumentNullException("EtlContext is not initialized. Add all Services before startup");
+            }
         }
 
-        public void SetConfiguration<T>(T configuration)
+        public static T GetService<T>()
         {
-            if (configuration != null)
-                lock (_lock)
-                {
-                    _configuration = configuration;
-                }                
+            Check();
+            return Services.GetRequiredService<T>();
         }
 
+        public static ILogger Logger => GetLogger();
+
+        public static ILogger GetLogger(string? name = null)
+        {
+            return GetService<ILoggerProvider>()
+                .CreateLogger(name ?? nameof(EtlContext));
+        }
+
+        public static IConfiguration Configuration => GetService<IConfiguration>();
+
+        public static string ConnectionString(string? name = null)
+        {
+            Check();
+            return Configuration.ConnectionString(name);
+        }
     }
 }

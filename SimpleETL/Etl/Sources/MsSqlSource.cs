@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 using System.Text;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
-    public class SqlDataSource : DataSource
+    public class MsSqlSource : DataSource
     {
         private readonly SqlConnection _connection;
         private readonly string _sqlQuery;
         private readonly IDictionary<string, object> _parameters;
         private readonly int _timeOut;
 
-        public SqlDataSource(string connectionString, string sqlQuery, IDictionary<string, object> parameters = null, int timeOut = 30)
+        public MsSqlSource(string connectionString, string sqlQuery, IDictionary<string, object> parameters = null, int timeOut = 30)
         {
             _connection = new SqlConnection(connectionString);
             _sqlQuery = sqlQuery;
@@ -43,7 +41,7 @@ namespace SimpleETL
                 {
                     foreach (var p in _parameters)
                     {
-                        var parameter = new SqlParameter()
+                        var parameter = new SqlParameter
                         {
                             ParameterName = p.Key,
                             Value = p.Value

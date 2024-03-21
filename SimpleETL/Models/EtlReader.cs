@@ -3,7 +3,7 @@ using System.Linq;
 using System.Data.Common;
 using System.Collections;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
 
     public class EtlReader : DbDataReader

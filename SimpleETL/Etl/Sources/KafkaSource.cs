@@ -6,7 +6,7 @@ using System.Linq;
 using System;
 using System.Threading;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public class KafkaSource : DataSource
     {

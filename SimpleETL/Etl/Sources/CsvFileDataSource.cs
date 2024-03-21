@@ -4,31 +4,30 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public class CsvFileDataSource : DataSource
     {
-        private string _filesFolder;
-        private List<string> _columns;
-        private string _delimeter;
-        private bool _hasColumnNames;
+        private readonly string _filesFolder;
+        private List<string>? _columns;
+        private readonly string _delimeter;
+        private readonly bool _hasColumnNames;
         private DateTime _lastDate;
-        private Func<string, bool> _fileSearchPredicate;
-        private string _columnsSearchRe;     
-        
-        public string LastFileName{ get; private set; }
+        private readonly Func<string, bool>? _fileSearchPredicate;
+        private readonly string? _columnsSearchRe;
+
+        public string LastFileName { get; private set; }
 
         public CsvFileDataSource(string filesFolder,
             string delimiter,
             bool hasColumnNames,
             DateTime lastDate,
-            IList<string> columns = null,
-            Func<string, bool> fileSearchPredicate = null,
-            string columnsSearchRe = null)
+            IList<string>? columns = null,
+            Func<string, bool>? fileSearchPredicate = null,
+            string? columnsSearchRe = null)
         {
-
             _filesFolder = filesFolder ?? throw new ArgumentNullException(nameof(filesFolder));
-            _delimeter = delimiter ?? throw new ArgumentNullException(nameof(delimiter)); 
+            _delimeter = delimiter ?? throw new ArgumentNullException(nameof(delimiter));
 
             _hasColumnNames = hasColumnNames;
             _lastDate = lastDate;
@@ -78,9 +77,9 @@ namespace SimpleETL
                                     for (int i = 1; i < matches[0].Groups.Count; i++)
                                     {
                                         fColumns[i - 1] = matches[0].Groups[i].Value;
-                                    }                                    
+                                    }
                                 }
-                            }                                
+                            }
                             else
                                 fColumns = fRow.Split(_delimeter);
 
@@ -120,8 +119,8 @@ namespace SimpleETL
                                 RowAffected++;
 
                                 yield return row;
-                            }                                                                           
-                        }                        
+                            }
+                        }
                     }
 
                     Log($"Proceed  {RowAffected} rows from file {file}");
@@ -129,8 +128,8 @@ namespace SimpleETL
                     LastDate = File.GetLastWriteTime(file);
 
                     RowAffected = 0;
-                }               
-            }            
+                }
+            }
         }
     }
 }

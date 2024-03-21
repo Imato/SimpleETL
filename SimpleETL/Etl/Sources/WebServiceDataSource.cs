@@ -7,7 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public class WebServiceDataSource : DataSource
     {

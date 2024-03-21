@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public abstract class DataDestination : EtlObject, IDataDestination
     {
-
-        public DataDestination()
+        public virtual void PutData(IEnumerable<IEtlRow> data)
         {
-            Debug("Open data destination");
+            foreach (var row in data)
+            {
+                PutData(row);
+            }
         }
 
-
-        public override void Dispose()
-        {
-            Debug("Close data destination");
-        }
-
-        public abstract void PutData(IEnumerable<IEtlRow> data);
         public abstract void PutData(IEtlRow row);
 
         public int RowAffected { get; protected set; }

@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public class EtlObject : IDisposable
     {
-        private ILogger _logger;
+        protected ILogger Logger;
 
         public string Name { get; set; }
 
@@ -12,24 +14,11 @@ namespace SimpleETL
 
         public EtlObject()
         {
-            _logger = EtlContext.GetContext().Logger;
-            Name = GetType().Name;
+            Logger = EtlContext.Services
+                .GetRequiredService<ILoggerProvider>()
+                .CreateLogger(GetType()?.FullName ?? nameof(EtlObject));
+            Name ??= GetType().Name;
             Debug("Created");
-        }
-
-        public EtlObject(string name) : this()
-        {
-            Name = name;
-        }
-
-        protected T GetConfiguration<T>()
-        {
-            return EtlContext.GetContext().GetConfiguration<T>();
-        }
-
-        protected void SetConfiguration<T>(T configuration)
-        {
-            EtlContext.GetContext().SetConfiguration(configuration);
         }
 
         public virtual void Dispose()
@@ -39,22 +28,22 @@ namespace SimpleETL
 
         protected void Log(object message)
         {
-            _logger?.Information(ToString(), message);
+            Logger?.LogInformation(Json.Serialize(message));
         }
 
         protected void Error(object message)
         {
-            _logger?.Error(ToString(), message);
+            Logger?.LogError(Json.Serialize(message));
         }
 
         protected void Debug(object message)
         {
-            _logger?.Debug(ToString(), message);
+            Logger?.LogDebug(Json.Serialize(message));
         }
 
         protected void Warning(object message)
         {
-            _logger?.Warning(ToString(), message);
+            Logger?.LogWarning(Json.Serialize(message));
         }
 
         public override string ToString()

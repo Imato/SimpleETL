@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public interface IEtlRow
     {

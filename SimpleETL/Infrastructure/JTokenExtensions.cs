@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public static class JTokenExtensions
     {
@@ -12,7 +12,6 @@ namespace SimpleETL
             {
                 return jtoken.ToObject(type);
             }
-
             catch
             {
                 return null;
@@ -39,7 +38,7 @@ namespace SimpleETL
                         var dto = r.TryGetObject(type);
                         if (dto != null)
                         {
-                            yield return ObjectMapper.GetEtlRow(dto, type, flow);
+                            yield return ObjectMapper.GetEtlRow(dto, flow);
                         }
                     }
                 }

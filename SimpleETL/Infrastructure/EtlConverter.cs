@@ -1,53 +1,61 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 
-
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public static class EtlConverter
     {
-        public static T TryGetValue<T, V>(V value)
+        public static T? TryGetValue<T, V>(V value)
         {
             try
             {
                 return (T)Convert.ChangeType(value, typeof(T));
             }
-
             catch
             {
                 return default(T);
             }
-            
         }
 
-        public static object GetTypedValue(this JToken jtocken)
+        public static object? GetTypedValue(this JToken jTocken)
         {
-            if (jtocken != null)
+            if (jTocken != null)
             {
-                switch (jtocken.Type)
+                switch (jTocken.Type)
                 {
                     case JTokenType.None:
                         return null;
+
                     case JTokenType.Object:
-                        return jtocken.Value<object>();
+                        return jTocken.Value<object>();
+
                     case JTokenType.Array:
-                        return jtocken.Value<Array>();                  
+                        return jTocken.Value<Array>();
+
                     case JTokenType.Integer:
-                        return jtocken.Value<int>();
+                        return jTocken.Value<int>();
+
                     case JTokenType.Float:
-                        return jtocken.Value<double>();
+                        return jTocken.Value<double>();
+
                     case JTokenType.String:
-                        return jtocken.Value<string>();
+                        return jTocken.Value<string>();
+
                     case JTokenType.Boolean:
-                        return jtocken.Value<bool>();                   
+                        return jTocken.Value<bool>();
+
                     case JTokenType.Date:
-                        return jtocken.Value<DateTime>();
+                        return jTocken.Value<DateTime>();
+
                     case JTokenType.Guid:
-                        return jtocken.Value<Guid>();
+                        return jTocken.Value<Guid>();
+
                     case JTokenType.Uri:
-                        return jtocken.Value<Uri>();
+                        return jTocken.Value<Uri>();
+
                     case JTokenType.TimeSpan:
-                        return jtocken.Value<TimeSpan>();
+                        return jTocken.Value<TimeSpan>();
+
                     default:
                         return null;
                 }

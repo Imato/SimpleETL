@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public static class EtlRowExtension
     {

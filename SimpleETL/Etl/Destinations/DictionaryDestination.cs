@@ -1,18 +1,16 @@
 ﻿using System.Collections.Generic;
 using System;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
-    public class DictionaryDestination : EtlObject, IDataSource, IDataDestination
+    public class DictionaryDestination : DataDestination, IDataSource
 
     {
         private Dictionary<object, object> _data;
         private string _keyColumn, _valueColumn;
 
-        public DictionaryDestination(string keyColumn, string valueColumn)
+        public DictionaryDestination(string keyColumn, string valueColumn) : base()
         {
-            Debug("Create data source");
-
             if (string.IsNullOrEmpty(keyColumn))
                 throw new ArgumentNullException(nameof(keyColumn));
 
@@ -24,19 +22,16 @@ namespace SimpleETL
             _valueColumn = valueColumn;
         }
 
-        public void PutData(IEnumerable<IEtlRow> data)
+        public override void PutData(IEtlRow row)
         {
-            foreach (var row in data)
+            if (row[_keyColumn] != null)
             {
-                if (row[_keyColumn] != null)
-                {
-                    var key = row[_keyColumn];
-                    var value = row[_valueColumn];
-                    if (_data.ContainsKey(key))
-                        _data[key] = value;
-                    else
-                        _data.Add(key, value);
-                }
+                var key = row[_keyColumn];
+                var value = row[_valueColumn];
+                if (_data.ContainsKey(key))
+                    _data[key] = value;
+                else
+                    _data.Add(key, value);
             }
         }
 
@@ -61,11 +56,6 @@ namespace SimpleETL
                 row[_valueColumn] = r.Value;
                 yield return row;
             }
-        }
-
-        public override void Dispose()
-        {
-            Debug("Close data source");
         }
     }
 }

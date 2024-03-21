@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace SimpleETL
+﻿namespace Imato.SimpleETL
 {
     public class BaseOperation : EtlObject, IOperation
     {
@@ -9,12 +6,5 @@ namespace SimpleETL
         {
             Debug("Started");
         }
-
-        public virtual Task RunAsync()
-        {
-            return Task.Run(() => Debug("Started Async"));
-        }
-
-
     }
 }

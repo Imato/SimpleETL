@@ -1,20 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public class MsSqlDestination : DataDestination
     {
-        private SqlConnection _connection;
-        private SqlBulkCopy _bulk;
-        private EtlTable _buffer;
-        private object _lock;
+        private readonly SqlConnection _connection;
+        private readonly SqlBulkCopy _bulk;
+        private readonly EtlTable _buffer;
 
         public MsSqlDestination(string connectionString,
             string tableName,
             int bufferSize = 10000,
-            IList<string> columns = null,
-            EtlObject parent = null)
+            IList<string>? columns = null,
+            EtlObject? parent = null)
         {
             _buffer = new EtlTable(bufferSize);
             _connection = new SqlConnection(connectionString);
@@ -35,8 +33,6 @@ namespace SimpleETL
 
             if (parent != null)
                 ParentEtl = parent;
-
-            _lock = new object();
         }
 
         public override void Dispose()
@@ -87,13 +83,10 @@ namespace SimpleETL
 
         private void WriteToServer()
         {
-            lock (_lock)
+            if (_buffer.RowCount > 0)
             {
-                if (_buffer.RowCount > 0)
-                {
-                    _bulk.WriteToServer(new EtlReader(_buffer));
-                    _buffer.Clear();
-                }
+                _bulk.WriteToServer(new EtlReader(_buffer));
+                _buffer.Clear();
             }
         }
 

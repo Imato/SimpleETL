@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public class JsonFileDataSource : DataSource
     {

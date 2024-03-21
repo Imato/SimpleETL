@@ -1,10 +1,7 @@
-﻿using System.Threading.Tasks;
-
-namespace SimpleETL
+﻿namespace Imato.SimpleETL
 {
     public interface IOperation
     {
         void Run();
-        Task RunAsync();
     }
 }

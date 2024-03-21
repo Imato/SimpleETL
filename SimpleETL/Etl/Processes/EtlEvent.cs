@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public class EtlStatusEventArgs : EventArgs
     {
@@ -9,7 +9,6 @@ namespace SimpleETL
         public double DurationSecconds { get; set; }
         public bool IsSuccessful { get; set; }
         public string ErrorMessage { get; set; }
-
     }
 
     public delegate void EtlEventHandler(EtlObject sender, EtlStatusEventArgs e);

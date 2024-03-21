@@ -1,64 +1,36 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 
-namespace SimpleETL
+namespace Imato.SimpleETL
 {
     public class EtlPackage : EtlObject, IEtlPackage
     {
         private ConcurrentStack<IEtlProcess> _processes;
 
-        public EtlPackage(string name) : base(name)
+        public EtlPackage(string name) : this()
         {
-            _processes = new ConcurrentStack<IEtlProcess>();
+            Name = name;
         }
 
-        public EtlPackage():base()
+        public EtlPackage()
         {
             _processes = new ConcurrentStack<IEtlProcess>();
         }
 
         public virtual void Run()
         {
+            var tasks = new List<Task>();
+
             try
             {
                 while (!_processes.IsEmpty)
                 {
                     _processes.TryPop(out IEtlProcess p);
-                    p.Run();
-                }
-
-                OnComplet?.Invoke(this);
-            }
-
-            catch
-            {
-                OnFailure?.Invoke(this);
-                OnComplet?.Invoke(this);
-                throw;
-            }
-
-            OnSuccess?.Invoke(this);
-        }
-
-        public virtual Task RunAsync()
-        {
-            try
-            {
-                var tasks = new List<Task>();
-
-                while (!_processes.IsEmpty)
-                {
-                    _processes.TryPop(out IEtlProcess p);
-                    tasks.Add(p.RunAsync());
+                    tasks.Add(Task.Factory.StartNew(() => p.Run()));
                 }
 
                 Task.WaitAll(tasks.ToArray());
-
                 OnComplet?.Invoke(this);
             }
-
             catch
             {
                 OnFailure?.Invoke(this);
@@ -67,7 +39,6 @@ namespace SimpleETL
             }
 
             OnSuccess?.Invoke(this);
-            return Task.CompletedTask;
         }
 
         public void AddEtlProcess(IEtlProcess process)
@@ -79,7 +50,7 @@ namespace SimpleETL
                 _processes.Push(eo as IEtlProcess);
             }
             else
-                _processes.Push(process);            
+                _processes.Push(process);
         }
 
         public EtlPackageEventHandler OnSuccess;

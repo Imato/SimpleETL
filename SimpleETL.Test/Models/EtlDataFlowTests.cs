@@ -1,24 +1,19 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Linq;
-
-namespace SimpleETL.Test.Models
+﻿namespace Imato.SimpleETL.Test.Models
 {
-    [TestClass]
     public class EtlDataFlowTests
     {
-        [TestMethod]
+        [Test]
         public void CreateTest()
         {
             IEtlDataFlow flow = new EtlDataFlow();
-            Assert.IsTrue(flow.ColumnsCount == 0);
-            Assert.IsTrue(flow.Columns.Count() == 0);
-            Assert.IsFalse(flow.HasColumn("Test"));
-            Assert.IsTrue(flow.GetColumn("Test") == null);
-            Assert.IsTrue(flow.GetColumn(10) == null);
+            Assert.That(flow.ColumnsCount, Is.EqualTo(0));
+            Assert.That(flow.Columns.Count(), Is.EqualTo(0));
+            Assert.That(flow.HasColumn("Test"), Is.False);
+            Assert.That(flow.GetColumn("Test"), Is.Null);
+            Assert.That(flow.GetColumn(10), Is.Null);
         }
 
-        [TestMethod]
+        [Test]
         public void AddTests()
         {
             IEtlDataFlow flow = new EtlDataFlow();
@@ -27,18 +22,18 @@ namespace SimpleETL.Test.Models
             row["Date"] = DateTime.Now;
             row["Int"] = 100;
 
-            Assert.IsTrue(flow.ColumnsCount == 3);
-            Assert.IsTrue(flow.Columns.Count() == 3);
-            Assert.IsTrue(flow.HasColumn("String"));
-            Assert.AreEqual(1, flow.GetColumn("Date").Id);
-            Assert.AreEqual("Int", flow.GetColumn(2).Name);
+            Assert.That(flow.ColumnsCount, Is.EqualTo(3));
+            Assert.That(flow.Columns.Count(), Is.EqualTo(3));
+            Assert.That(flow.HasColumn("String"), Is.True);
+            Assert.That(flow.GetColumn("Date").Id, Is.EqualTo(1));
+            Assert.That(flow.GetColumn(2).Name, Is.EqualTo("Int"));
 
-            Assert.IsFalse(flow.HasColumn("Test"));
-            Assert.IsTrue(flow.GetColumn("Test") == null);
-            Assert.IsTrue(flow.GetColumn(10) == null);
+            Assert.That(flow.HasColumn("Test"), Is.False);
+            Assert.That(flow.GetColumn("Test"), Is.Null);
+            Assert.That(flow.GetColumn(10), Is.Null);
         }
 
-        [TestMethod]
+        [Test]
         public void NewRowTests()
         {
             IEtlDataFlow flow = new EtlDataFlow();
@@ -48,13 +43,13 @@ namespace SimpleETL.Test.Models
             row["Int"] = 100;
 
             var row2 = row.Copy();
-            Assert.AreEqual(row.ColumnsCount, row2.ColumnsCount);
-            Assert.AreEqual(flow.ColumnsCount, row2.ColumnsCount);
-            Assert.AreEqual(flow, row.Flow);
-            Assert.AreEqual(flow, row2.Flow);
+            Assert.That(row.ColumnsCount, Is.EqualTo(row2.ColumnsCount));
+            Assert.That(flow.ColumnsCount, Is.EqualTo(row2.ColumnsCount));
+            Assert.That(flow, Is.EqualTo(row.Flow));
+            Assert.That(flow, Is.EqualTo(row2.Flow));
         }
 
-        [TestMethod]
+        [Test]
         public void IncreaseTest()
         {
             IEtlDataFlow flow = new EtlDataFlow();
@@ -64,12 +59,12 @@ namespace SimpleETL.Test.Models
                 flow.AddColumn(i.ToString(), i.GetType());
             }
 
-            Assert.AreEqual(100, flow.ColumnsCount);
-            Assert.AreEqual("100", flow.GetColumn(99).Name);
-            Assert.AreEqual(99, flow.GetColumn("100").Id);
+            Assert.That(100, Is.EqualTo(flow.ColumnsCount));
+            Assert.That("100", Is.EqualTo(flow.GetColumn(99).Name));
+            Assert.That(99, Is.EqualTo(flow.GetColumn("100").Id));
         }
 
-        [TestMethod]
+        [Test]
         public void OrderTest()
         {
             IEtlDataFlow flow = new EtlDataFlow();
@@ -79,12 +74,11 @@ namespace SimpleETL.Test.Models
             flow.AddColumn("3", "3".GetType());
             flow.AddColumn("99", "99".GetType());
 
-            Assert.AreEqual(0, flow.GetColumn("1").Id);
-            Assert.AreEqual(1, flow.GetColumn("5").Id);
-            Assert.AreEqual(2, flow.GetColumn("100").Id);
-            Assert.AreEqual(3, flow.GetColumn("3").Id);
-            Assert.AreEqual(4, flow.GetColumn("99").Id);
+            Assert.That(0, Is.EqualTo(flow.GetColumn("1").Id));
+            Assert.That(1, Is.EqualTo(flow.GetColumn("5").Id));
+            Assert.That(2, Is.EqualTo(flow.GetColumn("100").Id));
+            Assert.That(3, Is.EqualTo(flow.GetColumn("3").Id));
+            Assert.That(4, Is.EqualTo(flow.GetColumn("99").Id));
         }
-
     }
 }

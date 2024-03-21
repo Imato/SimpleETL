@@ -1,16 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SimpleETL.Test.Models
+﻿namespace Imato.SimpleETL.Test.Models
 {
-    [TestClass]
     public class EtlRowTests
     {
-        [TestMethod]
+        [Test]
         public void CreateTest()
         {
             IEtlRow row = new EtlRow(new EtlDataFlow());
@@ -19,24 +11,24 @@ namespace SimpleETL.Test.Models
             row["Test"] = "Test2";
             row["Date"] = DateTime.Now;
 
-            Assert.AreEqual(4, row.ColumnsCount);
-            Assert.AreEqual("Test", row["Col100"]);
-            Assert.IsNull(row["Col101"]);
-            Assert.AreEqual(100, row[0]);
+            Assert.That(4, Is.EqualTo(row.ColumnsCount));
+            Assert.That("Test", Is.EqualTo(row["Col100"]));
+            Assert.That(row["Col101"], Is.Null);
+            Assert.That(100, Is.EqualTo(row[0]));
         }
 
-        [TestMethod]
+        [Test]
         public void CheckTypeTest()
         {
             IEtlRow row = new EtlRow(new EtlDataFlow());
             row["Col100"] = 100;
-            Assert.AreEqual(100, row["Col100"]);
+            Assert.That(100, Is.EqualTo(row["Col100"]));
             row["Col1"] = "Test";
             row["Object"] = null;
-            Assert.ThrowsException<TypeAccessException>(() => row["Col100"] = "Test");
+            Assert.Throws<TypeAccessException>(() => row["Col100"] = "Test");
         }
 
-        [TestMethod]
+        [Test]
         public void GetColumnTest()
         {
             IEtlRow row = new EtlRow(new EtlDataFlow());
@@ -45,42 +37,42 @@ namespace SimpleETL.Test.Models
             row["Test"] = "Test2";
             row["Date"] = DateTime.Now;
 
-            Assert.AreEqual(4, row.ColumnsCount);
-            Assert.AreEqual("Test", row["Col100"]);
-            Assert.IsNull(row["Col101"]);
-            Assert.AreEqual(100, row[0]);
+            Assert.That(4, Is.EqualTo(row.ColumnsCount));
+            Assert.That("Test", Is.EqualTo(row["Col100"]));
+            Assert.That(row["Col101"], Is.Null);
+            Assert.That(100, Is.EqualTo(row[0]));
 
-            Assert.AreEqual("Col1", row.ColumnName(0));
-            Assert.AreEqual("Date", row.ColumnName(3));
+            Assert.That("Col1", Is.EqualTo(row.ColumnName(0)));
+            Assert.That("Date", Is.EqualTo(row.ColumnName(3)));
 
-            Assert.AreEqual(1, row.ColumnId("Col100"));
-            Assert.AreEqual(2, row.ColumnId("Test"));
+            Assert.That(1, Is.EqualTo(row.ColumnId("Col100")));
+            Assert.That(2, Is.EqualTo(row.ColumnId("Test")));
 
-            Assert.ThrowsException<IndexOutOfRangeException>(() => row.ColumnName(15));
-            Assert.ThrowsException<IndexOutOfRangeException>(() => row.ColumnId("Test3"));
+            Assert.Throws<IndexOutOfRangeException>(() => row.ColumnName(15));
+            Assert.Throws<IndexOutOfRangeException>(() => row.ColumnId("Test3"));
         }
 
-        [TestMethod]
+        [Test]
         public void ClearTest()
         {
             IEtlRow row = new EtlRow(new EtlDataFlow());
             row["Col1"] = 100;
-            Assert.AreEqual(100, row["Col1"]);
+            Assert.That(100, Is.EqualTo(row["Col1"]));
             row.Clear();
-            Assert.IsNull(row["Col1"]);
+            Assert.That(row["Col1"], Is.Null);
         }
 
-        [TestMethod]
+        [Test]
         public void CopyTest()
         {
             IEtlRow row = new EtlRow(new EtlDataFlow());
             row["Col1"] = 100;
-            Assert.AreEqual(100, row["Col1"]);
+            Assert.That(100, Is.EqualTo(row["Col1"]));
 
             IEtlRow row2 = row.Copy();
-            Assert.AreEqual(row.Flow, row2.Flow);
-            Assert.AreEqual(row.ColumnsCount, row2.ColumnsCount);
-            Assert.AreEqual(100, row2["Col1"]);
+            Assert.That(row.Flow, Is.EqualTo(row2.Flow));
+            Assert.That(row.ColumnsCount, Is.EqualTo(row2.ColumnsCount));
+            Assert.That(100, Is.EqualTo(row2["Col1"]));
         }
     }
 }

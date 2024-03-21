@@ -1,20 +1,17 @@
-﻿using System;
-using System.Linq;
-
-namespace SimpleETL
+﻿namespace Imato.SimpleETL
 {
     public class ArgumentsParser
     {
-        private string[] _args;
+        private string[]? _args;
 
-        public ArgumentsParser(string[] args = null)
+        public ArgumentsParser(string[]? args = null)
         {
             _args = args;
         }
 
-        public object Get(string argumentName)
+        public object? Get(string argumentName)
         {
-            if(_args == null 
+            if (_args == null
                 || _args.Length == 0
                 || !_args.Contains(argumentName))
             {
@@ -28,7 +25,7 @@ namespace SimpleETL
                 return true;
             }
 
-            if (_args.Length > index + 1 
+            if (_args.Length > index + 1
                 && _args[index + 1].StartsWith("-"))
             {
                 return true;

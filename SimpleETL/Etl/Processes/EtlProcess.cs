@@ -1,27 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace SimpleETL
+﻿namespace Imato.SimpleETL
 {
     public class EtlProcess : EtlObject, IEtlProcess
     {
         private DataSource? _source;
         private DataTransformation? _transformation;
         private DataDestination? _destination;
-
-        public EtlProcess()
-        { }
-
-        public EtlProcess(string name) : base(name)
-        {
-        }
-
-        public EtlProcess(string name, DataSource source, DataTransformation transformation, DataDestination destination) : base(name)
-        {
-            Source = source;
-            Transformation = transformation;
-            Destination = destination;
-        }
 
         public DataDestination? Destination
         {
@@ -65,6 +48,10 @@ namespace SimpleETL
 
             Source?.GetData()?.Transform(Transformation)?.Put(Destination);
 
+            if (Source?.RowAffected != null)
+            {
+            }
+
             Source?.Dispose();
             Transformation?.Dispose();
             Destination?.Dispose();
@@ -102,11 +89,6 @@ namespace SimpleETL
 
             OnFinish?.Invoke(this, etlStatus);
             OnComplete?.Invoke(this, etlStatus);
-        }
-
-        public async Task RunAsync()
-        {
-            await Task.Run(Run);
         }
 
         protected virtual void PreExecute()

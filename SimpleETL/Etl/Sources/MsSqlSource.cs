@@ -43,7 +43,7 @@ namespace Imato.SimpleETL
                     {
                         var parameter = new SqlParameter
                         {
-                            ParameterName = p.Key,
+                            ParameterName = $"@{p.Key}",
                             Value = p.Value
                         };
 

@@ -15,7 +15,7 @@ namespace Imato.SimpleETL
             RowAffected = 0;
         }
 
-        public override void PutData(IEtlRow row)
+        public override void PutData(IEtlRow row, CancellationToken token = default)
         {
             if (row[_sourceColumn] != null
                     && row[_sourceColumn].GetType() == typeof(T))
@@ -41,7 +41,7 @@ namespace Imato.SimpleETL
             RowAffected = 0;
         }
 
-        public override void PutData(IEtlRow row)
+        public override void PutData(IEtlRow row, CancellationToken token = default)
         {
             _data.Add(row);
             RowAffected++;

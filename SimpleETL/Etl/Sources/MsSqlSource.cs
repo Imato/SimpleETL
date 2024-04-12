@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 using System.Text;
 
 namespace Imato.SimpleETL
@@ -23,13 +24,14 @@ namespace Imato.SimpleETL
             if (_connection.State != System.Data.ConnectionState.Closed)
                 _connection.Close();
 
-            Log($"Finish getting data from SQL source. {RowAffected} rows");
+            Debug($"Finish getting data from SQL source. {RowAffected} rows");
             base.Dispose();
         }
 
-        public override IEnumerable<IEtlRow> GetData()
+        public override IEnumerable<IEtlRow> GetData(CancellationToken token = default)
         {
-            _connection.Open();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
 
             using (var command = new SqlCommand(_sqlQuery, _connection))
             {
@@ -57,7 +59,7 @@ namespace Imato.SimpleETL
 
                 using (var reader = command.ExecuteReader())
                 {
-                    while (reader.Read())
+                    while (reader.Read() && !token.IsCancellationRequested)
                     {
                         var row = CreateRow();
 
@@ -83,7 +85,7 @@ namespace Imato.SimpleETL
                 sb.AppendLine($"declare {p.ParameterName} varchar(255) = '{p.Value}'");
             }
             sb.AppendLine($"{command.CommandText}");
-            Log(sb.ToString());
+            Debug(sb.ToString());
         }
     }
 }

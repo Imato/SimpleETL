@@ -122,7 +122,7 @@ namespace Imato.SimpleETL
             {
                 try
                 {
-                    Log($"Try to connect Kafka server {b}");
+                    Debug($"Try to connect Kafka server {b}");
 
                     var config = new ConsumerConfig
                     {
@@ -136,11 +136,10 @@ namespace Imato.SimpleETL
                     var cBulder = new ConsumerBuilder<K, string>(config);
                     var aBuilder = new AdminClientBuilder(config);
 
-                    Log("Connected");
+                    Debug("Connected");
 
                     return (cBulder.Build(), aBuilder.Build());
                 }
-
                 catch { }
             }
 
@@ -167,7 +166,7 @@ namespace Imato.SimpleETL
             return result;
         }
 
-        public override IEnumerable<IEtlRow> GetData()
+        public override IEnumerable<IEtlRow> GetData(CancellationToken token = default)
         {
             var rows = 0;
             var cancelled = false;
@@ -175,7 +174,7 @@ namespace Imato.SimpleETL
 
             using (var consumer = GetConsumer())
             {
-                while (!cancelled)
+                while (!cancelled && !token.IsCancellationRequested)
                 {
                     var msg = consumer.Consume(TIME_OUT);
 
@@ -201,11 +200,11 @@ namespace Imato.SimpleETL
 
                     if (rows % _batchSize == 0)
                     {
-                        Log($"Proceed {rows} rows");
+                        Debug($"Proceed {rows} rows");
                     }
                 }
 
-                Log($"Total rows {rows}");
+                Debug($"Total rows {rows}");
                 Debug("Done");
                 consumer.Unsubscribe();
             }

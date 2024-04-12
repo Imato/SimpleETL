@@ -57,8 +57,9 @@ namespace Imato.SimpleETL
 
         public EtlColumn? GetColumn(string name)
         {
-            var column = columns.Where(x => x.Name == name).FirstOrDefault();
-            return column;
+            return columns
+                .Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                .FirstOrDefault();
         }
 
         public EtlColumn? GetColumn(int id)

@@ -30,7 +30,7 @@ namespace Imato.SimpleETL
 
         private IEnumerable<IEtlRow> GetData(Type type)
         {
-            Log($"Get JSON files data source from folder {_filesFolder}");
+            Debug($"Get JSON files data source from folder {_filesFolder}");
 
             if (!Directory.Exists(_filesFolder))
                 Error($"Directory {_filesFolder} not exists!");
@@ -44,7 +44,7 @@ namespace Imato.SimpleETL
 
                 foreach (var file in files)
                 {
-                    Log($"Open file {file}");
+                    Debug($"Open file {file}");
 
                     var content = File.ReadAllText(file);
                     var jt = JToken.Parse(content);
@@ -55,7 +55,7 @@ namespace Imato.SimpleETL
                         yield return row;
                     }
 
-                    Log($"Return {rows} rows from {file}");
+                    Debug($"Return {rows} rows from {file}");
 
                     LastFileName = file;
                     LastFileDate = File.GetLastWriteTime(file);
@@ -64,7 +64,7 @@ namespace Imato.SimpleETL
             }
         }
 
-        public override IEnumerable<IEtlRow> GetData()
+        public override IEnumerable<IEtlRow> GetData(CancellationToken token = default)
         {
             return GetData(_dataType);
         }

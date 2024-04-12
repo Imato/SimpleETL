@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace Imato.SimpleETL
+﻿namespace Imato.SimpleETL
 {
-    public abstract class DataDestination : EtlObject, IDataDestination
+    public class DataDestination : EtlObject, IDataDestination
     {
-        public virtual void PutData(IEnumerable<IEtlRow> data)
+        public virtual void PutData(IEnumerable<IEtlRow> data, CancellationToken token = default)
         {
             foreach (var row in data)
             {
@@ -12,7 +10,10 @@ namespace Imato.SimpleETL
             }
         }
 
-        public abstract void PutData(IEtlRow row);
+        public virtual void PutData(IEtlRow row, CancellationToken token = default)
+        {
+            RowAffected++;
+        }
 
         public int RowAffected { get; protected set; }
     }

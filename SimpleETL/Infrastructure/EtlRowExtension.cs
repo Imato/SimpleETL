@@ -73,7 +73,7 @@ namespace Imato.SimpleETL
             return data;
         }
 
-        public static IEnumerable<IEtlRow> Put(this IEnumerable<IEtlRow> data, IDataDestination? destination)
+        public static IEnumerable<IEtlRow> Put(this IEnumerable<IEtlRow> data, IDataDestination? destination, CancellationToken token = default)
         {
             if (data != null && destination != null)
                 destination.PutData(data);

@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace Imato.SimpleETL
 {
-    public class EtlObject : IDisposable
+    public class EtlObject : IEtlObject
     {
         protected ILogger Logger;
 
@@ -17,7 +16,7 @@ namespace Imato.SimpleETL
             Logger = EtlContext.Services
                 .GetRequiredService<ILoggerProvider>()
                 .CreateLogger(GetType()?.FullName ?? nameof(EtlObject));
-            Name ??= GetType().Name;
+            Name ??= GetType().FullName!;
             Debug("Created");
         }
 
@@ -36,14 +35,14 @@ namespace Imato.SimpleETL
             Logger?.LogError(Json.Serialize(message));
         }
 
-        protected void Debug(object message)
-        {
-            Logger?.LogDebug(Json.Serialize(message));
-        }
-
         protected void Warning(object message)
         {
             Logger?.LogWarning(Json.Serialize(message));
+        }
+
+        protected void Debug(object message)
+        {
+            Logger?.LogDebug(Json.Serialize(message));
         }
 
         public override string ToString()
@@ -52,6 +51,11 @@ namespace Imato.SimpleETL
                 return $"{ParentEtl}/{Name}";
             else
                 return Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode() + 230094;
         }
     }
 }

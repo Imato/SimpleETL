@@ -1,7 +1,9 @@
 ﻿namespace Imato.SimpleETL
 {
-    public interface IEtlProcess
+    public interface IEtlProcess : IEtlObject
     {
-        void Run();
+        void Run(CancellationToken token = default);
+
+        public EtlState State { get; }
     }
 }

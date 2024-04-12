@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Imato.SimpleETL
+﻿namespace Imato.SimpleETL
 {
-    public abstract class DataSource : EtlObject, IDataSource
+    public class DataSource : EtlObject, IDataSource
     {
         protected IEtlDataFlow flow;
 
@@ -17,7 +14,12 @@ namespace Imato.SimpleETL
             return new EtlRow(flow);
         }
 
-        public abstract IEnumerable<IEtlRow> GetData();
+        public virtual IEnumerable<IEtlRow> GetData(CancellationToken token = default)
+        {
+            RowAffected = 0;
+            LastDate = DateTime.Now;
+            return Enumerable.Empty<IEtlRow>();
+        }
 
         public int RowAffected { get; protected set; }
         public DateTime LastDate { get; protected set; }

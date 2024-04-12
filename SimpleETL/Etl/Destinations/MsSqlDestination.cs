@@ -1,4 +1,5 @@
 ﻿using System.Data.SqlClient;
+using System.Data;
 
 namespace Imato.SimpleETL
 {
@@ -11,7 +12,7 @@ namespace Imato.SimpleETL
         public MsSqlDestination(string connectionString,
             string tableName,
             int bufferSize = 10000,
-            IList<string>? columns = null,
+            IEnumerable<string>? columns = null,
             EtlObject? parent = null)
         {
             _buffer = new EtlTable(bufferSize);
@@ -39,16 +40,15 @@ namespace Imato.SimpleETL
         {
             WriteToServer();
 
-            if (_connection.State != System.Data.ConnectionState.Closed)
+            if (_connection.State != ConnectionState.Closed)
                 _connection.Close();
             _bulk.Close();
             _buffer.Dispose();
             base.Dispose();
         }
 
-        public override void PutData(IEtlRow row)
+        public override void PutData(IEtlRow row, CancellationToken token = default)
         {
-            Open();
             _buffer.AddRow(row);
 
             if (_bulk.ColumnMappings.Count == 0)
@@ -60,17 +60,16 @@ namespace Imato.SimpleETL
                 }
             }
 
-            if (_buffer.RowCount == _bulk.BatchSize)
+            if (_buffer.RowCount >= _bulk.BatchSize)
                 WriteToServer();
 
             RowAffected++;
         }
 
-        public override void PutData(IEnumerable<IEtlRow> data)
+        public override void PutData(IEnumerable<IEtlRow> data, CancellationToken token = default)
         {
-            Log($"Try to put data in sql destination table {_bulk.DestinationTableName}");
+            Debug($"Try to put data in sql destination table {_bulk.DestinationTableName}");
 
-            Open();
             foreach (var row in data)
             {
                 PutData(row);
@@ -78,22 +77,19 @@ namespace Imato.SimpleETL
 
             WriteToServer();
 
-            Log($"Saved {RowAffected} rows total");
+            Debug($"Saved {RowAffected} rows total");
         }
 
         private void WriteToServer()
         {
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
+
             if (_buffer.RowCount > 0)
             {
                 _bulk.WriteToServer(new EtlReader(_buffer));
                 _buffer.Clear();
             }
-        }
-
-        private void Open()
-        {
-            if (_connection.State != System.Data.ConnectionState.Open)
-                _connection.Open();
         }
     }
 }

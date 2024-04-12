@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json.Linq;
@@ -37,9 +33,9 @@ namespace Imato.SimpleETL
             _headers = headers;
         }
 
-        protected IEnumerable<IEtlRow> GetData(Type type)
+        protected IEnumerable<IEtlRow> GetData(Type type, CancellationToken token = default)
         {
-            Log($"Get data from WEB {_url}");
+            Debug($"Get data from WEB {_url}");
             var rows = 0;
 
             using (_handler)
@@ -64,8 +60,8 @@ namespace Imato.SimpleETL
                     }
                     http.Timeout = TimeSpan.FromSeconds(_timeOutSec);
 
-                    var responce = http.GetAsync(_url).Result;
-                    var content = responce.Content.ReadAsStringAsync().Result;
+                    var responce = http.GetAsync(_url, token).Result;
+                    var content = responce.Content.ReadAsStringAsync(token).Result;
 
                     if (!responce.IsSuccessStatusCode)
                     {
@@ -83,17 +79,21 @@ namespace Imato.SimpleETL
 
                         foreach (var row in jt.GetRows(type, _jsonPath, flow))
                         {
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
+                            }
                             rows++;
                             yield return row;
                         }
                     }
 
-                    Log($"Return {rows} rows from WEB {_url}");
+                    Debug($"Return {rows} rows from WEB {_url}");
                 }
             }
         }
 
-        public override IEnumerable<IEtlRow> GetData()
+        public override IEnumerable<IEtlRow> GetData(CancellationToken token = default)
         {
             return GetData(_dataType);
         }

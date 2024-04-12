@@ -70,19 +70,24 @@ namespace Imato.SimpleETL
                         Encoding.Default.GetBytes(basicCredentials)));
         }
 
-        public override IEnumerable<IEtlRow> GetData()
+        public override IEnumerable<IEtlRow> GetData(CancellationToken token = default)
         {
-            Log($"Try to get data from JIRA: {_url}");
+            Debug($"Try to get data from JIRA: {_url}");
 
             var rowCount = 0;
 
             foreach (var issue in GetIssues())
             {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 rowCount++;
                 yield return GetNewRow(issue);
             }
 
-            Log($"Total {rowCount} rows processed");
+            Debug($"Total {rowCount} rows processed");
         }
 
         private IEnumerable<JToken> GetIssues()
@@ -109,7 +114,7 @@ namespace Imato.SimpleETL
 
         private IEnumerable<JToken> GetIssues(Uri uri)
         {
-            Log($"Get date from {uri}");
+            Debug($"Get date from {uri}");
 
             var responce = _http.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;
             var json = JsonConvert.DeserializeObject<JObject>(responce);
@@ -123,7 +128,7 @@ namespace Imato.SimpleETL
                 if (errorText.Contains("Does Not Exist")
                     || errorText.Contains("do not have the permission"))
                 {
-                    Log($"{uri}: errorText");
+                    Debug($"{uri}: errorText");
                     yield break;
                 }
 

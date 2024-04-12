@@ -22,13 +22,13 @@ namespace Imato.SimpleETL
             _dataType = dataType;
         }
 
-        public override IEnumerable<IEtlRow> GetData()
+        public override IEnumerable<IEtlRow> GetData(CancellationToken token = default)
         {
             var dateFrom = _lastDate;
             var dateNow = DateTime.Parse(DateTime.Now.ToString(_dateFormat));
             var dateTo = dateNow;
 
-            Log($"Get data from Hadoop history for {dateFrom.ToString(_dateFormat)} - {dateTo.ToString(_dateFormat)} ");
+            Debug($"Get data from Hadoop history for {dateFrom.ToString(_dateFormat)} - {dateTo.ToString(_dateFormat)} ");
 
             var urlStart = $"{_url}?startedTimeBegin={(dateFrom - _unix).TotalMilliseconds}&startedTimeEnd={(dateTo - _unix).TotalMilliseconds}";
             var urlFinish = $"{_url}?finishedTimeBegin={(dateFrom - _unix).TotalMilliseconds}&finishedTimeEnd={(dateTo - _unix).TotalMilliseconds}";
@@ -40,8 +40,8 @@ namespace Imato.SimpleETL
                     LastDate = dateTo;
                     return sourceStart.GetData()
                         .Union(sourceFinish.GetData());
-                }                    
-            }            
+                }
+            }
         }
     }
 }

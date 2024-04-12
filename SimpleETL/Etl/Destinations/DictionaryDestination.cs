@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System;
-
-namespace Imato.SimpleETL
+﻿namespace Imato.SimpleETL
 {
     public class DictionaryDestination : DataDestination, IDataSource
 
@@ -22,7 +19,7 @@ namespace Imato.SimpleETL
             _valueColumn = valueColumn;
         }
 
-        public override void PutData(IEtlRow row)
+        public override void PutData(IEtlRow row, CancellationToken token = default)
         {
             if (row[_keyColumn] != null)
             {
@@ -45,7 +42,7 @@ namespace Imato.SimpleETL
             return null;
         }
 
-        public IEnumerable<IEtlRow> GetData()
+        public IEnumerable<IEtlRow> GetData(CancellationToken token = default)
         {
             var flow = new EtlDataFlow();
 

@@ -1,10 +1,8 @@
-﻿using System.Collections.Concurrent;
-
-namespace Imato.SimpleETL
+﻿namespace Imato.SimpleETL
 {
-    public class EtlPackage : EtlObject, IEtlPackage
+    public class EtlPackage : EtlProcess, IEtlPackage
     {
-        private ConcurrentStack<IEtlProcess> _processes;
+        private Queue<IEtlProcess> _processes;
 
         public EtlPackage(string name) : this()
         {
@@ -13,48 +11,68 @@ namespace Imato.SimpleETL
 
         public EtlPackage()
         {
-            _processes = new ConcurrentStack<IEtlProcess>();
+            _processes = new Queue<IEtlProcess>();
         }
 
-        public virtual void Run()
+        public override void Run(CancellationToken token = default)
         {
+            if (!State.IsActive)
+            {
+                Debug("Process IsActive = false");
+                return;
+            }
+
             var tasks = new List<Task>();
 
             try
             {
-                while (!_processes.IsEmpty)
+                State.StartTime = DateTime.Now;
+                OnStart?.Invoke(this, State);
+
+                PreExecute();
+
+                while (_processes.Count > 0)
                 {
-                    _processes.TryPop(out IEtlProcess p);
-                    tasks.Add(Task.Factory.StartNew(() => p.Run()));
+                    if (_processes.TryDequeue(out IEtlProcess p))
+                    {
+                        tasks.Add(Task.Factory.StartNew(
+                            () =>
+                            {
+                                p.Run();
+                                p.Dispose();
+                            }, token));
+                    }
                 }
 
                 Task.WaitAll(tasks.ToArray());
-                OnComplet?.Invoke(this);
+
+                PostExecute();
+
+                State.IsSuccessful = true;
+                OnSuccess?.Invoke(this, State);
+                Finish();
             }
-            catch
+            catch (Exception e)
             {
-                OnFailure?.Invoke(this);
-                OnComplet?.Invoke(this);
+                State.IsSuccessful = false;
+                State.ErrorMessage = e.ToLogString();
+                Finish();
+
+                OnFailure?.Invoke(this, State);
+                OnComplete?.Invoke(this, State);
                 throw;
             }
 
-            OnSuccess?.Invoke(this);
+            OnFinish?.Invoke(this, State);
+            OnComplete?.Invoke(this, State);
         }
 
         public void AddEtlProcess(IEtlProcess process)
         {
-            var eo = process as EtlObject;
-            if (eo != null)
-            {
-                eo.ParentEtl = this;
-                _processes.Push(eo as IEtlProcess);
-            }
-            else
-                _processes.Push(process);
-        }
+            process.ParentEtl = this;
+            _processes.Enqueue(process);
 
-        public EtlPackageEventHandler OnSuccess;
-        public EtlPackageEventHandler OnFailure;
-        public EtlPackageEventHandler OnComplet;
+            EtlContext.Register(process);
+        }
     }
 }

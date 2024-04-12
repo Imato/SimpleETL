@@ -2,11 +2,30 @@
 {
     public class EtlProcess : EtlObject, IEtlProcess
     {
-        private DataSource? _source;
-        private DataTransformation? _transformation;
-        private DataDestination? _destination;
+        private DataSource _source = new();
+        private DataTransformation _transformation = new();
+        private DataDestination _destination = new();
 
-        public DataDestination? Destination
+        public EtlEventHandler OnStart = null!;
+        public EtlEventHandler OnFinish = null!;
+        public EtlEventHandler OnSuccess = null!;
+        public EtlEventHandler OnFailure = null!;
+        public EtlEventHandler OnComplete = null!;
+
+        public EtlState State { get; }
+
+        public EtlProcess()
+        {
+            OnStart += (_, args) => Debug($"Process started at {args.StartTime}");
+            OnFinish += (_, args) => Debug($"ETL process {Name} is finished. Duration: {args.DurationSeconds:N3} seconds");
+            OnSuccess += (_, args) => Debug($"ETL process {Name} is succeed. Duration: {args.DurationSeconds:N3} seconds");
+            OnFailure += (_, args) => Debug($"Error in ETL process {Name}!\n{args.ErrorMessage}");
+            OnComplete += (_, args) => Debug($"Process ended at {args.EndTime}");
+
+            State = new EtlState();
+        }
+
+        public DataDestination Destination
         {
             get => _destination;
             set
@@ -18,7 +37,7 @@
             }
         }
 
-        public DataTransformation? Transformation
+        public DataTransformation Transformation
         {
             get => _transformation;
             set
@@ -30,7 +49,7 @@
             }
         }
 
-        public DataSource? Source
+        public DataSource Source
         {
             get => _source;
             set
@@ -42,73 +61,71 @@
             }
         }
 
-        protected virtual void Execute()
+        protected virtual void Execute(CancellationToken token = default)
         {
-            Log("Execute ETL process");
+            Debug("Execute ETL process");
 
-            Source?.GetData()?.Transform(Transformation)?.Put(Destination);
-
-            if (Source?.RowAffected != null)
-            {
-            }
-
-            Source?.Dispose();
-            Transformation?.Dispose();
-            Destination?.Dispose();
+            Source.GetData(token).Transform(Transformation).Put(Destination, token);
         }
 
-        public void Run()
+        public virtual void Run(CancellationToken token = default)
         {
-            var etlStatus = new EtlStatusEventArgs()
+            if (!State.IsActive)
             {
-                StartTime = DateTime.Now,
-                IsSuccessful = false
-            };
+                Debug("Process IsActive = false");
+                return;
+            }
 
             try
             {
-                OnStart?.Invoke(this, etlStatus);
+                State.StartTime = DateTime.Now;
 
-                PreExecute();
-                Execute();
-                PostExecute();
+                OnStart?.Invoke(this, State);
 
-                etlStatus.EndTime = DateTime.Now;
-                etlStatus.IsSuccessful = true;
-                etlStatus.DurationSecconds = (etlStatus.EndTime - etlStatus.StartTime).TotalMilliseconds / 1000.0;
+                PreExecute(token);
+                Execute(token);
+                PostExecute(token);
 
-                OnSuccess?.Invoke(this, etlStatus);
+                State.IsSuccessful = true;
+                Finish();
+
+                OnSuccess?.Invoke(this, State);
             }
             catch (Exception e)
             {
-                etlStatus.IsSuccessful = false;
-                etlStatus.ErrorMessage = e.ToLogString();
+                State.IsSuccessful = false;
+                State.ErrorMessage = e.ToLogString();
+                Finish();
 
-                OnFailure?.Invoke(this, etlStatus);
+                OnFailure?.Invoke(this, State);
             }
 
-            OnFinish?.Invoke(this, etlStatus);
-            OnComplete?.Invoke(this, etlStatus);
+            OnFinish?.Invoke(this, State);
+            OnComplete?.Invoke(this, State);
         }
 
-        protected virtual void PreExecute()
+        protected virtual void PreExecute(CancellationToken token = default)
         {
-            Log("Start ETL process");
+            Debug("Start ETL process");
         }
 
-        protected virtual void PostExecute()
+        protected virtual void PostExecute(CancellationToken token = default)
         {
-            Log("End ETL process");
+            Debug("End ETL process");
+        }
 
+        public override void Dispose()
+        {
             Source?.Dispose();
             Transformation?.Dispose();
             Destination?.Dispose();
+            base.Dispose();
         }
 
-        public EtlEventHandler? OnStart;
-        public EtlEventHandler? OnFinish;
-        public EtlEventHandler? OnSuccess;
-        public EtlEventHandler? OnFailure;
-        public EtlEventHandler? OnComplete;
+        protected void Finish()
+        {
+            State.EndTime = DateTime.Now;
+            State.DurationSeconds = (State.EndTime - State.StartTime).TotalMilliseconds / 1000.0;
+        }
     }
 }

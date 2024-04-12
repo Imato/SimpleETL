@@ -1,5 +1,4 @@
-﻿using Imato.SimpleETL.Infrastructure;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -8,6 +7,7 @@ namespace Imato.SimpleETL
     public static class EtlContext
     {
         public static IServiceProvider Services = null!;
+        public static readonly Dictionary<string, IEtlProcess> Processes = new();
 
         private static void Check()
         {
@@ -37,6 +37,12 @@ namespace Imato.SimpleETL
         {
             Check();
             return Configuration.ConnectionString(name);
+        }
+
+        public static void Register(IEtlProcess package)
+        {
+            if (!Processes.ContainsKey(package.Name))
+                Processes.Add(package.Name, package);
         }
     }
 }

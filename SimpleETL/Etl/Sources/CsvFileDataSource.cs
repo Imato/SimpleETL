@@ -38,9 +38,9 @@ namespace Imato.SimpleETL
                 _columns = new List<string>(columns);
         }
 
-        public override IEnumerable<IEtlRow> GetData()
+        public override IEnumerable<IEtlRow> GetData(CancellationToken token = default)
         {
-            Log($"Get CSV files data source from folder {_filesFolder}");
+            Debug($"Get CSV files data source from folder {_filesFolder}");
 
             if (!Directory.Exists(_filesFolder))
                 Error($"Directory {_filesFolder} not exists!");
@@ -58,7 +58,12 @@ namespace Imato.SimpleETL
 
                 foreach (var file in files)
                 {
-                    Log($"Open file {file}");
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    Debug($"Open file {file}");
 
                     foreach (var fRow in File.ReadAllLines(file))
                     {
@@ -123,7 +128,7 @@ namespace Imato.SimpleETL
                         }
                     }
 
-                    Log($"Proceed  {RowAffected} rows from file {file}");
+                    Debug($"Proceed  {RowAffected} rows from file {file}");
                     LastFileName = file;
                     LastDate = File.GetLastWriteTime(file);
 

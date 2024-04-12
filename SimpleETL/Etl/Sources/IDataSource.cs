@@ -4,7 +4,6 @@ namespace Imato.SimpleETL
 {
     public interface IDataSource
     {
-        IEnumerable<IEtlRow> GetData();
-
+        IEnumerable<IEtlRow> GetData(CancellationToken token = default);
     }
 }

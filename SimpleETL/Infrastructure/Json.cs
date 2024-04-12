@@ -30,6 +30,7 @@ namespace Imato.SimpleETL
         public static string Serialize<T>(T? value)
         {
             if (value == null) return "";
+            if (value is string) return value?.ToString() ?? "";
             return JsonSerializer.Serialize(value, JSON_OPTIONS);
         }
     }

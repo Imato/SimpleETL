@@ -1,14 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Collections;
 
 namespace Imato.SimpleETL
 {
-
     public class EtlReader : DbDataReader
     {
-
         private readonly IEtlTable source;
         private readonly IEtlDataFlow flow;
 
@@ -21,12 +17,11 @@ namespace Imato.SimpleETL
 
             this.source = source;
             flow = source[0].Flow;
-
         }
 
         private object GetColumn(int ordinal)
         {
-            return source[currentRow][ordinal]; 
+            return source[currentRow][ordinal];
         }
 
         private object GetColumn(string name)
@@ -34,9 +29,7 @@ namespace Imato.SimpleETL
             return source[currentRow][name];
         }
 
-
         public override object this[int ordinal] => GetColumn(ordinal);
-
 
         public override object this[string name] => GetColumn(name);
 
@@ -150,7 +143,7 @@ namespace Imato.SimpleETL
 
         public override string GetString(int ordinal)
         {
-            return (string) GetColumn(ordinal);
+            return (string)GetColumn(ordinal);
         }
 
         public override object GetValue(int ordinal)

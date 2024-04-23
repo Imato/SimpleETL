@@ -31,12 +31,13 @@ namespace Imato.SimpleETL
                         {
                             foreach (var p in parameters)
                             {
-                                var re = new Regex($"(@{p.Key})\\W*", RegexOptions.IgnoreCase);
+                                var key = p.Key.Replace("@", "");
+                                var re = new Regex($"(@{key})\\W*", RegexOptions.IgnoreCase);
                                 var m = re.Match(SqlCommand);
                                 if (m.Success && m.Groups.Count == 2)
                                 {
                                     var parameterName = m.Groups[1].Value;
-                                    cmd.Parameters.Add(new SqlParameter
+                                    cmd.Parameters.Add(new NpgsqlParameter
                                     {
                                         ParameterName = parameterName,
                                         Value = p.Value != null ? p.Value : DBNull.Value

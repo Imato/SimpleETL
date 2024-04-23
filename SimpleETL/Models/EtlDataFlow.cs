@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-
-namespace Imato.SimpleETL
+﻿namespace Imato.SimpleETL
 {
     public class EtlDataFlow : IEtlDataFlow
     {
@@ -28,6 +24,11 @@ namespace Imato.SimpleETL
             return AddColumn(name, type);
         }
 
+        public EtlColumn AddColumn(EtlColumn column)
+        {
+            return AddColumn(column.Name, column.Type);
+        }
+
         public EtlColumn AddColumn(string name, Type type)
         {
             var column = GetColumn(name);
@@ -38,14 +39,19 @@ namespace Imato.SimpleETL
                     && type != typeof(object)
                     && (column.Type == typeof(object) || column.Type == typeof(string)))
                 {
-                    column.Set(type);
+                    column.Type = type;
                 }
 
                 return column;
             }
 
             countColumns++;
-            column = new EtlColumn(countColumns, name, type);
+            column = new EtlColumn
+            {
+                Id = countColumns,
+                Name = name,
+                Type = type
+            };
             columns.Add(column);
             return column;
         }
@@ -57,9 +63,8 @@ namespace Imato.SimpleETL
 
         public EtlColumn? GetColumn(string name)
         {
-            return columns
-                .Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
-                .FirstOrDefault();
+            columns.TryGetValue(new EtlColumn { Name = name }, out var column);
+            return column;
         }
 
         public EtlColumn? GetColumn(int id)

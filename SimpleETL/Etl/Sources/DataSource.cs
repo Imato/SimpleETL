@@ -2,26 +2,26 @@
 {
     public class DataSource : EtlObject, IDataSource
     {
-        protected IEtlDataFlow flow;
-
-        public DataSource() : base()
-        {
-            flow = new EtlDataFlow();
-        }
+        protected IEtlDataFlow Flow = new EtlDataFlow();
 
         protected IEtlRow CreateRow()
         {
-            return new EtlRow(flow);
+            return new EtlRow(Flow);
+        }
+
+        public void AddColumn(EtlColumn column)
+        {
+            Flow.AddColumn(column);
         }
 
         public virtual IEnumerable<IEtlRow> GetData(CancellationToken token = default)
         {
-            RowAffected = 0;
+            RowsAffected = 0;
             LastDate = DateTime.Now;
             return Enumerable.Empty<IEtlRow>();
         }
 
-        public int RowAffected { get; protected set; }
+        public int RowsAffected { get; protected set; }
         public DateTime LastDate { get; protected set; }
     }
 }

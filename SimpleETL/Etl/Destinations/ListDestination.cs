@@ -12,7 +12,7 @@ namespace Imato.SimpleETL
         {
             _data = new List<T>();
             _sourceColumn = sourceColumn ?? throw new ArgumentNullException(nameof(sourceColumn));
-            RowAffected = 0;
+            RowsAffected = 0;
         }
 
         public override void PutData(IEtlRow row, CancellationToken token = default)
@@ -21,7 +21,7 @@ namespace Imato.SimpleETL
                     && row[_sourceColumn].GetType() == typeof(T))
             {
                 _data.Add(row[_sourceColumn] as T);
-                RowAffected++;
+                RowsAffected++;
             }
         }
 
@@ -38,13 +38,13 @@ namespace Imato.SimpleETL
         public ListDestination() : base()
         {
             _data = new List<IEtlRow>();
-            RowAffected = 0;
+            RowsAffected = 0;
         }
 
         public override void PutData(IEtlRow row, CancellationToken token = default)
         {
             _data.Add(row);
-            RowAffected++;
+            RowsAffected++;
         }
 
         public List<IEtlRow> GetData()

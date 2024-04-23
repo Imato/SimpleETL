@@ -21,7 +21,12 @@ namespace Imato.SimpleETL
             Timeout = timeout;
         }
 
-        public void Run(object? parameters = null)
+        public virtual void Run()
+        {
+            Run(null);
+        }
+
+        public virtual void Run(object? parameters)
         {
             Run(ObjectMapper.GetFields(parameters));
         }
@@ -43,7 +48,8 @@ namespace Imato.SimpleETL
                         {
                             foreach (var p in parameters)
                             {
-                                var re = new Regex($"(@{p.Key})\\W*", RegexOptions.IgnoreCase);
+                                var key = p.Key.Replace("@", "");
+                                var re = new Regex($"(@{key})\\W*", RegexOptions.IgnoreCase);
                                 var m = re.Match(SqlCommand);
                                 if (m.Success && m.Groups.Count == 2)
                                 {

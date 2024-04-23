@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Imato.SimpleETL
+﻿namespace Imato.SimpleETL
 {
     public class EtlRow : IEtlRow
     {
@@ -38,20 +35,17 @@ namespace Imato.SimpleETL
         private void Set(string name, object? value)
         {
             var column = flow.AddColumn(name, value?.GetType() ?? typeof(object));
-            if (value == null || column.Type == value.GetType())
-            {
-                if (data.Length == column.Id)
-                {
-                    var na = new object[data.Length * 2];
-                    Array.Copy(data, na, data.Length);
-                    data = na;
-                }
 
-                data[column.Id] = value;
-            }
-            else
+            if (data.Length == column.Id)
             {
-                throw new TypeAccessException($"Wrong type {value.GetType().Name} of {nameof(value)}");
+                var na = new object[data.Length * 2];
+                Array.Copy(data, na, data.Length);
+                data = na;
+            }
+
+            if (value != null)
+            {
+                data[column.Id] = value;
             }
         }
 
@@ -74,7 +68,6 @@ namespace Imato.SimpleETL
 
             set
             {
-                flow.AddColumn(name, value?.GetType() ?? typeof(object));
                 Set(name, value);
             }
         }

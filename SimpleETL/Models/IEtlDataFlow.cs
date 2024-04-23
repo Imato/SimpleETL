@@ -10,6 +10,10 @@ namespace Imato.SimpleETL
 
         EtlColumn AddColumn(string name, Type type);
 
+        EtlColumn AddColumn(EtlColumn column);
+
+        EtlColumn AddColumn<T>(string name);
+
         bool HasColumn(string name);
 
         EtlColumn? GetColumn(string name);

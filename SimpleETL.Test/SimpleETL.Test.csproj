@@ -22,4 +22,8 @@
     <ProjectReference Include="..\SimpleETL\SimpleETL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Etl\Destination\" />
+  </ItemGroup>
+
 </Project>

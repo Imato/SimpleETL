@@ -1,24 +1,10 @@
-﻿using System;
-
-namespace Imato.SimpleETL
+﻿namespace Imato.SimpleETL
 {
     public class EtlColumn
     {
-        public int Id { get; }
-        public string Name { get; }
-        public Type Type { get; private set; }
-
-        public EtlColumn(int id, string name, Type type)
-        {
-            Id = id;
-            Name = name;
-            Type = type ?? typeof(object);
-        }
-
-        public void Set(Type type)
-        {
-            Type = type;
-        }
+        public int Id { get; init; }
+        public string Name { get; init; }
+        public Type Type { get; set; }
 
         public override int GetHashCode()
         {

@@ -15,7 +15,7 @@ namespace Imato.SimpleETL
             IEnumerable<string>? columns = null,
             EtlObject? parent = null)
         {
-            _buffer = new EtlTable(bufferSize);
+            _buffer = new EtlTable(bufferSize + 100);
             _connection = new SqlConnection(connectionString);
             _bulk = new SqlBulkCopy(_connection)
             {
@@ -63,7 +63,7 @@ namespace Imato.SimpleETL
             if (_buffer.RowCount >= _bulk.BatchSize)
                 WriteToServer();
 
-            RowAffected++;
+            RowsAffected++;
         }
 
         public override void PutData(IEnumerable<IEtlRow> data, CancellationToken token = default)
@@ -77,7 +77,7 @@ namespace Imato.SimpleETL
 
             WriteToServer();
 
-            Debug($"Saved {RowAffected} rows total");
+            Debug($"Saved {RowsAffected} rows total");
         }
 
         private void WriteToServer()

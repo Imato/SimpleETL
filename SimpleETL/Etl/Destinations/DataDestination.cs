@@ -2,6 +2,8 @@
 {
     public class DataDestination : EtlObject, IDataDestination
     {
+        protected IEtlDataFlow Flow = null!;
+
         public virtual void PutData(IEnumerable<IEtlRow> data, CancellationToken token = default)
         {
             foreach (var row in data)
@@ -12,9 +14,13 @@
 
         public virtual void PutData(IEtlRow row, CancellationToken token = default)
         {
-            RowAffected++;
+            if (RowsAffected == 0)
+            {
+                Flow = row.Flow;
+            }
+            RowsAffected++;
         }
 
-        public int RowAffected { get; protected set; }
+        public int RowsAffected { get; set; }
     }
 }

@@ -77,7 +77,7 @@ namespace Imato.SimpleETL
                     {
                         var jt = JToken.Parse(content);
 
-                        foreach (var row in jt.GetRows(type, _jsonPath, flow))
+                        foreach (var row in jt.GetRows(type, _jsonPath, Flow))
                         {
                             if (token.IsCancellationRequested)
                             {

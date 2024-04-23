@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using NpgsqlTypes;
 using System.Data;
 
 namespace Imato.SimpleETL
@@ -32,8 +33,9 @@ namespace Imato.SimpleETL
 
         public override void PutData(IEtlRow row, CancellationToken token = default)
         {
+            base.PutData(row, token);
+
             _buffer.Enqueue(row);
-            RowAffected++;
             if (_buffer.Count >= _batchSize)
             {
                 BulkInsert();
@@ -44,7 +46,7 @@ namespace Imato.SimpleETL
         {
             base.PutData(data, token);
             BulkInsert();
-            Debug($"Saved {RowAffected} rows total");
+            Debug($"Saved {RowsAffected} rows total");
         }
 
         private void BulkInsert()
@@ -56,6 +58,8 @@ namespace Imato.SimpleETL
 
             var columns = string.Join(",", _columns);
             Debug($"Write buffer to table {_tableName}: {columns}");
+            Debug($"Write {_buffer.Count} rows");
+
             if (_connection.State != ConnectionState.Open)
             {
                 _connection.Open();
@@ -68,24 +72,48 @@ namespace Imato.SimpleETL
                 {
                     var row = _buffer.Dequeue();
                     writer.StartRow();
-                    foreach (var column in _columns)
+                    foreach (var columnName in _columns)
                     {
-                        var value = row[column];
-                        if (value != null)
+                        var column = Flow.GetColumn(columnName);
+
+                        if (column != null)
                         {
-                            writer.Write(row[column]);
-                        }
-                        else
-                        {
-                            writer.WriteNull();
+                            var value = row[column.Name];
+                            if (value != null)
+                            {
+                                switch (column.Type.Name)
+                                {
+                                    case nameof(DateTime):
+                                        writer.Write(value, NpgsqlDbType.Timestamp);
+                                        break;
+
+                                    case nameof(Boolean):
+                                        writer.Write(value, NpgsqlDbType.Boolean);
+                                        break;
+
+                                    case nameof(Int32):
+                                        writer.Write(value, NpgsqlDbType.Integer);
+                                        break;
+
+                                    case nameof(Int16):
+                                        writer.Write(value, NpgsqlDbType.Smallint);
+                                        break;
+
+                                    default:
+                                        writer.Write(value);
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                writer.WriteNull();
+                            }
                         }
                     }
                 }
 
                 writer.Complete();
             }
-
-            Debug($"Wrote {_buffer.Count} rows");
         }
 
         public override void Dispose()

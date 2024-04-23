@@ -24,7 +24,7 @@ namespace Imato.SimpleETL
             if (_connection.State != System.Data.ConnectionState.Closed)
                 _connection.Close();
 
-            Debug($"Finish getting data from SQL source. {RowAffected} rows");
+            Debug($"Finish getting data from SQL source. {RowsAffected} rows");
             base.Dispose();
         }
 
@@ -68,7 +68,7 @@ namespace Imato.SimpleETL
                             row[reader.GetName(i)] = !reader.IsDBNull(i) ? reader.GetValue(i) : null;
                         }
 
-                        RowAffected++;
+                        RowsAffected++;
                         yield return row;
                     }
                 }

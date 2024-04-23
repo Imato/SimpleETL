@@ -121,18 +121,18 @@ namespace Imato.SimpleETL
                                 // Add file name
                                 row["FileName"] = file;
 
-                                RowAffected++;
+                                RowsAffected++;
 
                                 yield return row;
                             }
                         }
                     }
 
-                    Debug($"Proceed  {RowAffected} rows from file {file}");
+                    Debug($"Proceed  {RowsAffected} rows from file {file}");
                     LastFileName = file;
                     LastDate = File.GetLastWriteTime(file);
 
-                    RowAffected = 0;
+                    RowsAffected = 0;
                 }
             }
         }

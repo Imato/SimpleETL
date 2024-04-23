@@ -49,7 +49,7 @@ namespace Imato.SimpleETL
                     var content = File.ReadAllText(file);
                     var jt = JToken.Parse(content);
 
-                    foreach (var row in jt.GetRows(type, _jsonPath, flow))
+                    foreach (var row in jt.GetRows(type, _jsonPath, Flow))
                     {
                         rows++;
                         yield return row;

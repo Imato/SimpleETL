@@ -2,7 +2,7 @@
 {
     public class EtlPackage : EtlProcess, IEtlPackage
     {
-        private Queue<IEtlProcess> _processes;
+        private readonly List<IEtlProcess> _processes;
 
         public EtlPackage(string name) : this()
         {
@@ -11,7 +11,7 @@
 
         public EtlPackage()
         {
-            _processes = new Queue<IEtlProcess>();
+            _processes = new();
         }
 
         public override void Run(CancellationToken token = default)
@@ -31,17 +31,13 @@
 
                 PreExecute();
 
-                while (_processes.Count > 0)
+                foreach (var p in _processes)
                 {
-                    if (_processes.TryDequeue(out IEtlProcess p))
-                    {
-                        tasks.Add(Task.Factory.StartNew(
+                    tasks.Add(Task.Factory.StartNew(
                             () =>
                             {
                                 p.Run();
-                                p.Dispose();
                             }, token));
-                    }
                 }
 
                 Task.WaitAll(tasks.ToArray());
@@ -70,9 +66,18 @@
         public void AddEtlProcess(IEtlProcess process)
         {
             process.ParentEtl = this;
-            _processes.Enqueue(process);
+            _processes.Add(process);
 
             EtlContext.Register(process);
+        }
+
+        public override void Dispose()
+        {
+            foreach (var process in _processes)
+            {
+                process.Dispose();
+            }
+            base.Dispose();
         }
     }
 }

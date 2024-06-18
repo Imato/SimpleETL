@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Imato.Logger.Extensions;
 
 namespace Imato.SimpleETL
 {
@@ -25,24 +26,28 @@ namespace Imato.SimpleETL
             Debug("Closed");
         }
 
-        protected void Log(object message)
+        protected void Debug(object message)
         {
-            Logger?.LogInformation(Json.Serialize(message));
+            Logger?.LogDebug(() => $"{Name}: {Json.Serialize(message)}");
         }
 
-        protected void Error(object message)
+        protected void Log(object message)
         {
-            Logger?.LogError(Json.Serialize(message));
+            Logger?.LogInformation(() => $"{Name}: {Json.Serialize(message)}");
         }
 
         protected void Warning(object message)
         {
-            Logger?.LogWarning(Json.Serialize(message));
+            Logger?.LogWarning(() => $"{Name}: {Json.Serialize(message)}");
         }
 
-        protected void Debug(object message)
+        protected void Error(object message, Exception? ex = null)
         {
-            Logger?.LogDebug(Json.Serialize(message));
+            if (ex != null)
+            {
+                Logger?.LogError(ex, () => $"{Name}: {Json.Serialize(message)}");
+            }
+            Logger?.LogError(() => $"{Name}: {Json.Serialize(message)}");
         }
 
         public override string ToString()

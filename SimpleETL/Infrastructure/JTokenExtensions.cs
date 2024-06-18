@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Imato.SimpleETL
 {
     public static class JTokenExtensions
     {
-        public static object TryGetObject(this JToken jtoken, Type type)
+        public static object? TryGetObject(this JToken jtoken, Type type)
         {
             try
             {
@@ -18,7 +16,7 @@ namespace Imato.SimpleETL
             }
         }
 
-        public static IEnumerable<IEtlRow> GetRows(this JToken jt, Type type, string jsonPath, IEtlDataFlow flow)
+        public static IEnumerable<IEtlRow> GetRows(this JToken jt, Type? type, string? jsonPath, IEtlDataFlow flow)
         {
             if (jt != null && jt.HasValues)
             {
@@ -35,7 +33,7 @@ namespace Imato.SimpleETL
                 {
                     foreach (var r in jt)
                     {
-                        var dto = r.TryGetObject(type);
+                        var dto = r.TryGetObject(type ?? typeof(object));
                         if (dto != null)
                         {
                             yield return ObjectMapper.GetEtlRow(dto, flow);

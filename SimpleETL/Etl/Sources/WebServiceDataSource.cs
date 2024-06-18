@@ -7,16 +7,16 @@ namespace Imato.SimpleETL
 {
     public class WebServiceDataSource : DataSource
     {
-        private readonly string _jsonPath;
-        private readonly Type _dataType;
+        private readonly string? _jsonPath;
+        private readonly Type? _dataType;
         private readonly string _url;
         private readonly HttpClientHandler _handler;
         private readonly int _timeOutSec;
         private readonly IEnumerable<Tuple<string, string>>? _headers;
 
         public WebServiceDataSource(string url,
-            string jsonPath,
-            Type dataType,
+            string? jsonPath = null,
+            Type? dataType = null,
             HttpClientHandler? handler = null,
             EtlObject? parent = null,
             int timeOutSec = 60,

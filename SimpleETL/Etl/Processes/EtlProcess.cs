@@ -87,7 +87,7 @@
                 PostExecute(token);
 
                 State.IsSuccessful = true;
-                Finish();
+                State.ErrorMessage = string.Empty;
 
                 OnSuccess?.Invoke(this, State);
             }
@@ -95,11 +95,10 @@
             {
                 State.IsSuccessful = false;
                 State.ErrorMessage = e.ToLogString();
-                Finish();
-
                 OnFailure?.Invoke(this, State);
             }
 
+            Finish();
             OnFinish?.Invoke(this, State);
             OnComplete?.Invoke(this, State);
         }

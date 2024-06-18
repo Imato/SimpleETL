@@ -2,6 +2,6 @@
 {
     public interface IEtlPackage : IEtlProcess
     {
-        void AddEtlProcess(IEtlProcess process);
+        void AddEtlProcess(Func<IEtlProcess> processFactory);
     }
 }

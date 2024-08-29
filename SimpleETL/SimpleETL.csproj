@@ -21,7 +21,7 @@
 		<PackageTags>ETL</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReleaseNotes>Ready to use</PackageReleaseNotes>
-		<Version>2.3.0</Version>
+		<Version>2.3.1</Version>
 		<AssemblyName>Imato.SimpleETL</AssemblyName>
 		<PackageIcon>icon.png</PackageIcon>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>

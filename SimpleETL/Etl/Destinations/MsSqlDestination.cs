@@ -17,7 +17,7 @@ namespace Imato.SimpleETL
         {
             _buffer = new EtlTable(bufferSize + 100);
             _connection = new SqlConnection(connectionString);
-            _bulk = new SqlBulkCopy(_connection)
+            _bulk = new SqlBulkCopy(_connection, SqlBulkCopyOptions.KeepIdentity, null)
             {
                 BatchSize = bufferSize,
                 DestinationTableName = tableName,

@@ -1,6 +1,6 @@
-﻿using Npgsql;
+﻿using System.Data;
 using System.Text;
-using System.Data;
+using Npgsql;
 
 namespace Imato.SimpleETL
 {
@@ -13,7 +13,7 @@ namespace Imato.SimpleETL
 
         public PostgresSource(string connectionString, string sqlQuery, IDictionary<string, object> parameters = null, int timeOut = 30)
         {
-            _connection = new NpgsqlConnection(connectionString);
+            _connection = new NpgsqlConnection(AppEnvironment.GetVariables(connectionString));
             _sqlQuery = sqlQuery;
             _parameters = parameters;
             _timeOut = timeOut;

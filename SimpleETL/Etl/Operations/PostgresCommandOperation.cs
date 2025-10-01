@@ -1,7 +1,6 @@
-﻿using Npgsql;
-using System.Data;
-using System.Data.SqlClient;
+﻿using System.Data;
 using System.Text.RegularExpressions;
+using Npgsql;
 
 namespace Imato.SimpleETL
 {
@@ -49,9 +48,9 @@ namespace Imato.SimpleETL
                         cmd.ExecuteNonQuery();
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    Error($"Error in sql command: {SqlCommand}");
+                    Error($"Error in sql command: {SqlCommand}", e);
                     throw;
                 }
             }

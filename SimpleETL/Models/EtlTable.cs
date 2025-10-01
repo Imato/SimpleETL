@@ -1,19 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-
-namespace Imato.SimpleETL
+﻿namespace Imato.SimpleETL
 {
     public class EtlTable : IDisposable, IEtlTable
     {
-        private readonly int _bufferSize;
-
-        private IEtlRow[] _table;        
+        private IEtlRow[] _table;
         private int _current;
 
         public EtlTable(int bufferSize = 1000)
         {
-            _bufferSize = bufferSize;
+            BufferSize = bufferSize;
             Clear();
         }
 
@@ -24,7 +18,7 @@ namespace Imato.SimpleETL
 
         public void Clear()
         {
-            _table = new IEtlRow[_bufferSize];
+            _table = new IEtlRow[BufferSize];
             _current = -1;
         }
 
@@ -38,20 +32,19 @@ namespace Imato.SimpleETL
             get { return _current + 1; }
         }
 
-        public int BufferSize => _bufferSize;
+        public int BufferSize { get; }
 
         public IEtlRow this[int row] =>
             row <= _current && row >= 0 ? _table[row] : throw new IndexOutOfRangeException(nameof(row));
 
         public void AddRow(IEtlRow row)
         {
-            if (_current >= _bufferSize - 1)
+            if (_current >= BufferSize - 1)
             {
-                throw new Exception($"Buffer size {_bufferSize} exceeded");
+                throw new Exception($"Buffer size {BufferSize} exceeded");
             }
 
             _table[++_current] = row;
         }
-
     }
 }

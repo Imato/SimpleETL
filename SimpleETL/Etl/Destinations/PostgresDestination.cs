@@ -1,12 +1,12 @@
-﻿using Npgsql;
+﻿using System.Data;
+using Npgsql;
 using NpgsqlTypes;
-using System.Data;
 
 namespace Imato.SimpleETL
 {
     public class PostgresDestination : DataDestination
     {
-        private readonly NpgsqlConnection _connection;
+        private readonly NpgsqlConnection? _connection;
         private readonly string _tableName;
         private readonly IEnumerable<string> _columns;
         private readonly int _batchSize;
@@ -20,15 +20,19 @@ namespace Imato.SimpleETL
             TimeSpan? timeout = null,
             EtlObject? parent = null)
         {
-            _batchSize = batchSize;
-            _connection = new NpgsqlConnection(connectionString);
-            _tableName = tableName;
-            _columns = columns;
-            _batchSize = batchSize;
-            timeout ??= TimeSpan.FromSeconds(30);
-            _timeout = timeout.Value;
+            if (!string.IsNullOrEmpty(connectionString) && !string.IsNullOrEmpty(tableName))
+            {
+                _batchSize = batchSize;
+                _connection = new NpgsqlConnection(AppEnvironment.GetVariables(connectionString));
+                _tableName = tableName;
+                _columns = columns;
+                _batchSize = batchSize;
+                timeout ??= TimeSpan.FromSeconds(30);
+                _buffer = new Queue<IEtlRow>(_batchSize);
+                _timeout = timeout.Value;
+            }
+
             ParentEtl = parent;
-            _buffer = new Queue<IEtlRow>(_batchSize);
         }
 
         public override void PutData(IEtlRow row, CancellationToken token = default)
@@ -51,7 +55,7 @@ namespace Imato.SimpleETL
 
         private void BulkInsert()
         {
-            if (_buffer.Count == 0)
+            if (_connection == null || _buffer == null || _buffer.Count == 0)
             {
                 return;
             }

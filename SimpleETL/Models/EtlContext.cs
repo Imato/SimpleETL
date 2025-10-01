@@ -1,4 +1,4 @@
-﻿using Imato.Dapper.DbContext;
+﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -8,7 +8,7 @@ namespace Imato.SimpleETL
     public static class EtlContext
     {
         public static IServiceProvider Services = null!;
-        public static readonly Dictionary<string, IEtlProcess> Processes = new();
+        public static readonly ConcurrentDictionary<string, IEtlProcess> Processes = new();
 
         private static void Check()
         {
@@ -43,7 +43,7 @@ namespace Imato.SimpleETL
         public static void Register(IEtlProcess package)
         {
             if (!Processes.ContainsKey(package.Name))
-                Processes.Add(package.Name, package);
+                Processes.TryAdd(package.Name, package);
         }
     }
 }

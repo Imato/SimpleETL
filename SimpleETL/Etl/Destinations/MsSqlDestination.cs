@@ -1,13 +1,13 @@
-﻿using System.Data.SqlClient;
-using System.Data;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 
 namespace Imato.SimpleETL
 {
     public class MsSqlDestination : DataDestination
     {
-        private readonly SqlConnection _connection;
-        private readonly SqlBulkCopy _bulk;
-        private readonly EtlTable _buffer;
+        private readonly SqlConnection? _connection;
+        private readonly SqlBulkCopy? _bulk;
+        private readonly EtlTable? _buffer;
 
         public MsSqlDestination(string connectionString,
             string tableName,
@@ -15,16 +15,19 @@ namespace Imato.SimpleETL
             IEnumerable<string>? columns = null,
             EtlObject? parent = null)
         {
-            _buffer = new EtlTable(bufferSize + 100);
-            _connection = new SqlConnection(connectionString);
-            _bulk = new SqlBulkCopy(_connection, SqlBulkCopyOptions.KeepIdentity, null)
+            if (!string.IsNullOrEmpty(connectionString) && !string.IsNullOrEmpty(tableName))
             {
-                BatchSize = bufferSize,
-                DestinationTableName = tableName,
-                BulkCopyTimeout = 30000
-            };
+                _buffer = new EtlTable(bufferSize + 100);
+                _connection = new SqlConnection(AppEnvironment.GetVariables(connectionString));
+                _bulk = new SqlBulkCopy(_connection, SqlBulkCopyOptions.KeepIdentity, null)
+                {
+                    BatchSize = bufferSize,
+                    DestinationTableName = tableName,
+                    BulkCopyTimeout = 30000
+                };
+            }
 
-            if (columns != null)
+            if (columns != null && _bulk != null)
             {
                 foreach (var c in columns)
                 {
@@ -40,35 +43,38 @@ namespace Imato.SimpleETL
         {
             WriteToServer();
 
-            if (_connection.State != ConnectionState.Closed)
-                _connection.Close();
-            _bulk.Close();
-            _buffer.Dispose();
+            if (_connection?.State != ConnectionState.Closed)
+                _connection?.Close();
+            _bulk?.Close();
+            _buffer?.Dispose();
             base.Dispose();
         }
 
         public override void PutData(IEtlRow row, CancellationToken token = default)
         {
-            _buffer.AddRow(row);
-
-            if (_bulk.ColumnMappings.Count == 0)
+            if (_bulk != null && _buffer != null)
             {
-                foreach (var column in row.Flow.Columns)
+                _buffer.AddRow(row);
+
+                if (_bulk.ColumnMappings.Count == 0)
                 {
-                    _bulk.ColumnMappings
-                        .Add(new SqlBulkCopyColumnMapping(column.Name, column.Name));
+                    foreach (var column in row.Flow.Columns)
+                    {
+                        _bulk.ColumnMappings
+                            .Add(new SqlBulkCopyColumnMapping(column.Name, column.Name));
+                    }
                 }
+
+                if (_buffer.RowCount >= _bulk.BatchSize)
+                    WriteToServer();
+
+                RowsAffected++;
             }
-
-            if (_buffer.RowCount >= _bulk.BatchSize)
-                WriteToServer();
-
-            RowsAffected++;
         }
 
         public override void PutData(IEnumerable<IEtlRow> data, CancellationToken token = default)
         {
-            Debug($"Try to put data in sql destination table {_bulk.DestinationTableName}");
+            Debug($"Try to put data in sql destination table {_bulk?.DestinationTableName}");
 
             foreach (var row in data)
             {
@@ -82,13 +88,13 @@ namespace Imato.SimpleETL
 
         private void WriteToServer()
         {
-            if (_connection.State != ConnectionState.Open)
-                _connection.Open();
+            if (_connection?.State != ConnectionState.Open)
+                _connection?.Open();
 
-            if (_buffer.RowCount > 0)
+            if (_buffer?.RowCount > 0)
             {
-                _bulk.WriteToServer(new EtlReader(_buffer));
-                _buffer.Clear();
+                _bulk?.WriteToServer(new EtlReader(_buffer));
+                _buffer?.Clear();
             }
         }
     }

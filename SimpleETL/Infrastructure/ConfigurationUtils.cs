@@ -1,7 +1,6 @@
-﻿using Imato.Dapper.DbContext;
-using Microsoft.Extensions.Configuration;
-using System.Data;
+﻿using System.Data;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 
 namespace Imato.SimpleETL
 {
@@ -43,7 +42,7 @@ namespace Imato.SimpleETL
                 .Where(x => name == null || x.Key == name)
                 .FirstOrDefault()
                 ?.Value ?? throw new Exception("Cannot find connection string in configuration");
-            return DbContext.GetConnectionString(connectionString);
+            return AppEnvironment.GetVariables(connectionString);
         }
     }
 }

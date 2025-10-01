@@ -1,6 +1,6 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
 using System.Text;
+using Microsoft.Data.SqlClient;
 
 namespace Imato.SimpleETL
 {
@@ -13,7 +13,7 @@ namespace Imato.SimpleETL
 
         public MsSqlSource(string connectionString, string sqlQuery, IDictionary<string, object> parameters = null, int timeOut = 30)
         {
-            _connection = new SqlConnection(connectionString);
+            _connection = new SqlConnection(AppEnvironment.GetVariables(connectionString));
             _sqlQuery = sqlQuery;
             _parameters = parameters;
             _timeOut = timeOut;
@@ -21,7 +21,7 @@ namespace Imato.SimpleETL
 
         public override void Dispose()
         {
-            if (_connection.State != System.Data.ConnectionState.Closed)
+            if (_connection.State != ConnectionState.Closed)
                 _connection.Close();
 
             Debug($"Finish getting data from SQL source. {RowsAffected} rows");

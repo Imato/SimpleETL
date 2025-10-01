@@ -1,8 +1,10 @@
-﻿namespace Imato.SimpleETL
+﻿using System.Collections.Concurrent;
+
+namespace Imato.SimpleETL
 {
     public class EtlPackage : EtlProcess, IEtlPackage
     {
-        private readonly List<IEtlProcess> _processes;
+        private readonly ConcurrentBag<IEtlProcess> _processes;
 
         public EtlPackage(string name) : this()
         {

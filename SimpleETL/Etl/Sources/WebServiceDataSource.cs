@@ -10,9 +10,7 @@ namespace Imato.SimpleETL
         private readonly string? _jsonPath;
         private readonly Type? _dataType;
         private readonly string _url;
-        private readonly HttpClientHandler _handler;
-        private readonly int _timeOutSec;
-        private readonly IEnumerable<Tuple<string, string>>? _headers;
+        private readonly HttpClient client = null!;
 
         public WebServiceDataSource(string url,
             string? jsonPath = null,
@@ -27,70 +25,64 @@ namespace Imato.SimpleETL
             _url = url;
             _jsonPath = jsonPath;
             _dataType = dataType;
-            _handler = handler ?? new HttpClientHandler();
             ParentEtl = parent;
-            _timeOutSec = timeOutSec;
-            _headers = headers;
+
+            if (client == null)
+            {
+                client = handler != null ? new HttpClient(handler) : new HttpClient();
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json; charset=utf-8");
+                if (headers != null && headers.Any())
+                {
+                    foreach (var header in headers)
+                    {
+                        client.DefaultRequestHeaders.TryAddWithoutValidation(
+                            header.Item1,
+                            header.Item2);
+                    }
+                }
+                if (handler?.Credentials != null)
+                {
+                    var c = (NetworkCredential)handler.Credentials;
+                    var byteArray = new UTF8Encoding().GetBytes($"{c.UserName}:{c.Password}");
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+                }
+                client.Timeout = TimeSpan.FromSeconds(timeOutSec);
+            }
         }
 
         protected IEnumerable<IEtlRow> GetData(Type type, CancellationToken token = default)
         {
             Debug($"Get data from WEB {_url}");
             var rows = 0;
+            var responce = client.GetAsync(_url, token).Result;
+            var content = responce.Content.ReadAsStringAsync(token).Result;
 
-            using (_handler)
+            if (!responce.IsSuccessStatusCode)
             {
-                using (var http = new HttpClient(_handler))
+                Error($"StatusCode: {responce.StatusCode}");
+                Error($"Content: {content}");
+            }
+            else
+            {
+                Debug(content);
+            }
+
+            if (!string.IsNullOrEmpty(content) && content != "[]")
+            {
+                var jt = JToken.Parse(content);
+
+                foreach (var row in jt.GetRows(type, _jsonPath, Flow))
                 {
-                    http.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json; charset=utf-8");
-                    if (_headers != null && _headers.Any())
+                    if (token.IsCancellationRequested)
                     {
-                        foreach (var header in _headers)
-                        {
-                            http.DefaultRequestHeaders.TryAddWithoutValidation(
-                                header.Item1,
-                                header.Item2);
-                        }
+                        break;
                     }
-                    if (_handler?.Credentials != null)
-                    {
-                        var c = (NetworkCredential)_handler.Credentials;
-                        var byteArray = new UTF8Encoding().GetBytes($"{c.UserName}:{c.Password}");
-                        http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-                    }
-                    http.Timeout = TimeSpan.FromSeconds(_timeOutSec);
-
-                    var responce = http.GetAsync(_url, token).Result;
-                    var content = responce.Content.ReadAsStringAsync(token).Result;
-
-                    if (!responce.IsSuccessStatusCode)
-                    {
-                        Error($"StatusCode: {responce.StatusCode}");
-                        Error($"Content: {content}");
-                    }
-                    else
-                    {
-                        Debug(content);
-                    }
-
-                    if (!string.IsNullOrEmpty(content) && content != "[]")
-                    {
-                        var jt = JToken.Parse(content);
-
-                        foreach (var row in jt.GetRows(type, _jsonPath, Flow))
-                        {
-                            if (token.IsCancellationRequested)
-                            {
-                                break;
-                            }
-                            rows++;
-                            yield return row;
-                        }
-                    }
-
-                    Debug($"Return {rows} rows from WEB {_url}");
+                    rows++;
+                    yield return row;
                 }
             }
+
+            Debug($"Return {rows} rows from WEB {_url}");
         }
 
         public override IEnumerable<IEtlRow> GetData(CancellationToken token = default)

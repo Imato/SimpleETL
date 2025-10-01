@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Imato.Logger.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Imato.Logger.Extensions;
 
 namespace Imato.SimpleETL
 {
@@ -14,48 +14,73 @@ namespace Imato.SimpleETL
 
         public EtlObject()
         {
+            var name = GetType()?.FullName ?? nameof(EtlObject);
             Logger = EtlContext.Services
                 .GetRequiredService<ILoggerProvider>()
-                .CreateLogger(GetType()?.FullName ?? nameof(EtlObject));
-            Name ??= GetType().FullName!;
-            Debug("Created");
+                .CreateLogger(name);
+            Name ??= name;
+            Debug($"Created {name}");
         }
 
         public virtual void Dispose()
         {
-            Debug("Closed");
+            Debug($"Closed {Name}");
         }
 
-        protected void Debug(object message)
+        protected void Debug(object message, Exception? ex = null)
         {
-            Logger?.LogDebug(() => $"{Name}: {Json.Serialize(message)}");
+            if (ex != null)
+            {
+                Logger?.LogDebug(ex, () => $"{this}: {Json.Serialize(message)}");
+            }
+            else
+            {
+                Logger?.LogDebug(() => $"{this}: {Json.Serialize(message)}");
+            }
         }
 
-        protected void Log(object message)
+        protected void Log(object message, Exception? ex = null)
         {
-            Logger?.LogInformation(() => $"{Name}: {Json.Serialize(message)}");
+            if (ex != null)
+            {
+                Logger?.LogInformation(ex, () => $"{this}: {Json.Serialize(message)}");
+            }
+            else
+            {
+                Logger?.LogInformation(() => $"{this}: {Json.Serialize(message)}");
+            }
         }
 
-        protected void Warning(object message)
+        protected void Warning(object message, Exception? ex = null)
         {
-            Logger?.LogWarning(() => $"{Name}: {Json.Serialize(message)}");
+            if (ex != null)
+            {
+                Logger?.LogWarning(ex, () => $"{this}: {Json.Serialize(message)}");
+            }
+            else
+            {
+                Logger?.LogWarning(() => $"{this}: {Json.Serialize(message)}");
+            }
         }
 
         protected void Error(object message, Exception? ex = null)
         {
             if (ex != null)
             {
-                Logger?.LogError(ex, () => $"{Name}: {Json.Serialize(message)}");
+                Logger?.LogError(ex, () => $"{this}: {Json.Serialize(message)}");
             }
-            Logger?.LogError(() => $"{Name}: {Json.Serialize(message)}");
+            else
+            {
+                Logger?.LogError(() => $"{this}: {Json.Serialize(message)}");
+            }
         }
 
         public override string ToString()
         {
             if (ParentEtl != null)
-                return $"{ParentEtl}/{Name}";
+                return $"{ParentEtl}/{Name ?? ""}";
             else
-                return Name;
+                return Name ?? "";
         }
 
         public override int GetHashCode()
